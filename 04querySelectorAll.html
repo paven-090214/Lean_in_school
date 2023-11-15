@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function choiceFinish(){
+            let ele=document.getElementsByName("click_insterest");
+            for(var i=0; i< ele.length; i++){
+                if(ele[i].checked){
+                    console.log(ele[i].value);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    관심사 :
+    <input type="checkbox" name="click_insterest" value="it" checked>IT/컴퓨터
+    <input type="checkbox" name="click_insterest" value="entertaiment">엔터테이먼트
+    <input type="checkbox" name="click_insterest" value="sports">스포츠
+    <input type="checkbox" name="click_insterest" value="shoping">쇼핑
+    <input type="checkbox" name="click_insterest" value="book">도서/책<br>
+    <button onclick="choiceFinish();">선택완료</button>
+    <div id="result"></div>
+</body>
+</html>
