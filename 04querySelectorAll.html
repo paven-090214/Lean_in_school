@@ -7,11 +7,18 @@
     <script>
         function choiceFinish(){
             let ele=document.getElementsByName("click_insterest");
+            let checked_ele=[];
             for(var i=0; i< ele.length; i++){
                 if(ele[i].checked){
-                    console.log(ele[i].value);
+                    console.push(ele[i].value);
                 }
             }
+            let ele_result=document.getElementById("result");
+            var str_result="";
+            for(var i= 0; i< checked_ele.length; i++){
+                str_result += checked_ele[i].value + ", ";
+            }
+            ele_result.innerHTML= str_result;
         }
     </script>
 </head>
