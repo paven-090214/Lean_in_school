@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.onmousemove=function(e){
+            document.querySelector("#mouseResult").innerHTML = "X 좌표 : " + e.clientX;
+        }
+        document.onkeydown=function(e){
+            alert("키 값 : " + e.keycode);
+            if(e.keycode == 37){
+                document.querySelector("#result").innerHTML="왼쪽 화살표를 눌렀음";
+            }    
+        };
+        //css 포지션 공부
+    </script>
+</head>
+<body>
+    <div id="result"></div>
+    <div id="mouseResult"></div>
+</body>
+</html>
