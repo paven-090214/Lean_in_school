@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .bg_chan{
+            background-color:aliceblue;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            var pw_num = 0
+            document.addEventListener('keyup', ()=>{//익명함수 사용
+                pw_num = document.getElementById('login_password').value.length;
+                document.getElementById('password_num').textContent = `글자 수 : ${pw_num}`;
+                pw_num++;
+            })
+
+            function reset(){
+                pw_num = 0;
+                document.getElementById('password_num').textContent = `글자 수 : ${pw_num}`;
+                document.getElementById('login_id').value = "";
+                document.getElementById('login_password').value = "";
+            }
+
+            document.getElementById('reset_button').addEventListener('click', reset);//유명함수 사용
+
+            function bg_change(){
+                document.body.style.backgroundColor = "aliceblue";
+            }
+
+            document.getElementById('bg_change').addEventListener('click', bg_change);
+
+            function login(){
+                var user_form = document.getElementById('addr_list');
+                var user = document.getElementById('login_id').value + document.getElementById('login_password').value;
+                
+                const item = document.createElement('li');
+                item.textContent = user;
+
+                user_form.appendChild(item);
+            
+            }
+            document.getElementById('login_button').addEventListener('click', login);
+        })
+        
+    </script>
+</head>
+<body>
+    <h1>로그인</h1>
+    아이디 : <input type="text" id="login_id"><br>
+    비밀번호 : <input type="password" id="login_password"><div id="password_num">글자 수 : 0</div><br>
+    <input type="button" value="로그인" id="login_button">
+    <input type="button" value="초기화" id="reset_button">
+    <input type="button" value="배경화면" id="bg_change">
+    <hr>
+    <h2>유저 목록</h2>
+    <ul id="addr_list">
+
+    </ul>
+</body>
+</html>

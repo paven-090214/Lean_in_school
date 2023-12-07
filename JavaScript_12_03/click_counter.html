@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            let counter = 0;
+            const clickCounter = document.querySelector('h1');
+
+            clickCounter.addEventListener('click',()=>{
+                counter++
+                clickCounter.textContent = `클릭 횟수 : ${counter}`
+            })
+
+            var reset = document.querySelector('input');
+            reset.addEventListener("click", ()=>{
+                counter = 0;
+                clickCounter.textContent = `클릭 횟수 : ${counter}`
+            })
+
+            
+            function bg_change(){
+                document.body.style.backgroundColor = "blanchedalmond";
+            }
+            var change_button = document.getElementById("bg_c");
+            change_button.addEventListener('click', bg_change)
+
+        })
+    </script>
+    <style>
+        h1{
+            user-select: none;
+        }
+        
+        .bg_chan{
+            background-color: blanchedalmond;
+        }
+    </style>
+</head>
+<body>
+    <h1>클릭 횟수 : 0</h1>
+    <input type="button" value="reset">
+    <input type="button" value="bg_change" id="bg_c" onclick = "bg_change()">
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+    /*
+        매개변수 2개
+        첫번째 : 이벤트의 종류
+        ex). DOMcontentLoaded
+        두번째 : 이벤트 리스너
+        ex). 익명함수, 화살표함수 ()=>
+        자바스크립트는 변수에 함수를 넣을 수 있다.
+        `` <- 이해하기
+
+
+    */
+        window.addEventListener("DOMContentLoaded", ()=>{
+            var divA = document.querySelector("#first");
+            var divB = document.querySelector("#second");
+            var h1 = document.createElement("h1");
+            h1.textContent = "이동하는  h1 태그";
+            const toFirst = ()=>{//const toFirst = ()=>); 가능
+                divA.appendChild(h1);
+                setTimeout(toSecond, 1000);
+            };
+
+            const toSecond = ()=>{
+                divB.appendChild(h1);
+                setTimeout(toFirst, 1000);
+            };
+            toFirst();
+        } 
+        );
+    </script>
+</head>
+<body>
+    <dv id="first">
+        <h1>첫번째 div태그 내부</h1>
+    </dv>
+        <dv id="second">
+        <h1>두번째 div태그 내부</h1>
+    </dv>
+</body>
+</html>
