@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function img(){
+            var basicValue = Number(document.getElementById("total").value);
+
+            for(var i = 1; i <= 3; i++){
+                var chkObj = document.getElementById("tag_" + i);
+                if(chkObj.checked){
+                    basicValue += Number(chkObj.value);
+                }
+            }
+            document.getElementById("total").value = basicValue;
+        }
+    </script>
+</head>
+<body>
+    <h1>image</h1>
+    <p> <image src="images/A1.png"></image></p>
+    Tag - 1 : <input type="checkbox" name="tag_1" value="1200" id="tag_1" onclick="img()"><br>
+    Tag - 2 : <input type="checkbox" name="tag_2" value="2400" id="tag_2" onclick="img()"><br>
+    Tag - 3 : <input type="checkbox" name="tag_3" value="3600" id="tag_3" onclick="img()"><br>
+    <hr>
+    <input tye="text" id="total" value="6000" readonly="readonly">
+</body>
+</html>
