@@ -34,7 +34,7 @@ class Student extends Person{
 public class StudentEx {
 	
 	public static void main(String[] args) {
-		Student st1 = new Student("�ȼ�ȯ", "��⵵", 79349922, "���̴�", "20230882");
+		Student st1 = new Student("¾È¼öÈ¯", "°æ±âµµ", 79349922, "µ¿¹Ì´ë", "20230882");
 		//st1.showPerson();
 		st1.showStudent();
 	}
