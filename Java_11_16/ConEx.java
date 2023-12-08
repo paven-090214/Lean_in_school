@@ -1,18 +1,18 @@
 class A{
 	public A() {
-		System.out.println("»ý¼ºÀÚ A");
+		System.out.println("Â»Ã½Â¼ÂºÃ€Ãš A");
 	}
 }
 
 class B extends A{
 	public B() {
-		System.out.println("»ý¼ºÀÚ B");
+		System.out.println("Â»Ã½Â¼ÂºÃ€Ãš B");
 	}
 }
 
 class C extends B{
 	public C() {
-		System.out.println("»ý¼ºÀÚ C");
+		System.out.println("Â»Ã½Â¼ÂºÃ€Ãš C");
 	}
 }
 
