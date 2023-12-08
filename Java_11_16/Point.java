@@ -19,9 +19,9 @@ public class Point {
 //		p1.set(1, 2);
 		p1.showPoint();
 		
-		ColorPoint cp = new ColorPoint(3, 4, "»¡°­");
+		ColorPoint cp = new ColorPoint(3, 4, "Â»Â¡Â°Â­");
 //		cp.set(3,  4);
-//		cp.setColor("»¡°­");
+//		cp.setColor("Â»Â¡Â°Â­");
 		cp.showColorPoint();
 		
 	}
