@@ -1,18 +1,18 @@
 class A2{
 	public A2(){
-		System.out.println("积己磊A");
+		System.out.println("靸濎劚鞛怉");
 	}
 	public A2(int x) {
-		System.out.println("概俺函荐积己磊A");
+		System.out.println("毵り皽氤�靾橃儩靹膘瀽A");
 	}
 }
 
 class B2{
 	public B2(){
-		System.out.println("积己磊B");
+		System.out.println("靸濎劚鞛怋");
 	}
 	public B2(int x) {
-		System.out.println("概俺函荐积己磊B");
+		System.out.println("毵り皽氤�靾橃儩靹膘瀽B");
 	}
 }
 
