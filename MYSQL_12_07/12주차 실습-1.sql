@@ -9,7 +9,7 @@ CREATE TABLE department (
      floor                 int ,
      PRIMARY KEY(deptno)
 );
-
+ 
 INSERT INTO department VALUES(1, '영업', 8);
 INSERT INTO department VALUES(2, '기획', 10);
 INSERT INTO department VALUES(3, '개발', 9);
