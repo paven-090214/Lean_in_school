@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function cangeClick(img_1){
+            img_1.src="images/A3.png";
+            img_1.width=600;
+            img_1.height=600;
+            document.getElementsByTagName("body")[0].style.backgroundColor="gren";
+        }
+        function changeOver(img_1){
+            //var image=document.getElementById("img");
+            img_1.src="images/A2.png";    
+        }
+    </script>
+</head>
+<body>
+    <img id="img" src="images/A1.png" onmouseover="changeOver(this)" onclick="cangeClick(this)">
+</body>
+</html>
