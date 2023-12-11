@@ -1,0 +1,947 @@
+-- 데이터베이스관리(담당: 김희숙) 14주차 실습(stu)
+
+==============================
+----------------------------------------
+-- SAFE_UPDATE 모드 해제
+SET SQL_SAFE_UPDATES = 0;
+
+-- 테이블 구조 확인
+DESC 테이블명;
+-----------------------------------------
+/*------- 제약조건 확인(MySQL) ------ */
+-- (MySQL) 제약조건 확인
+
+-- 제약조건(부서, 사원)
+SELECT * 
+FROM  information_schema.table_constraints
+WHERE table_name IN ('부서','사원');
+/* -------------------------------------- */
+==============================
+14주차 (실습)
+==============================
+# (MySQL)
+1단계: 데이터베이스 생성  studydb
+    사용할 데이터베이스 선택
+USE studydb;
+
+2단계: 테이블 생성          
+                                    
+3단계: 데이터 입력
+
+4단계: 데이터 조회
+select * from 성적;
+-----------------------------------------
+
+--------------------------------------------------
+
+--------------------------------------------------
+/*------------------------------------------------------*/
+-- [Quiz 1-01] 조인
+다음 두 릴레이션 R과 S에 대해 R을 왼쪽, S를 오른쪽 릴레이션으로 하고
+속성 B를 조인 속성으로 하여
+자연조인, 왼쪽외부조인, 완전외부조인으로 수행하였을 때
+결과 릴레이션의 카디널리트는 각각 얼마인가?
+
+R                S
+  A       B        B       C
+-----------     -----------
+   a       2        1        x
+   b       3        2       y
+   c        3        3      z
+   d       5
+--------------------------------------------------
+-- [Quiz 1-01] 조인 실행결과
+
+-- 결과 릴레이션의 카디날리티는 각각 무엇인가
+1) 자연조인
+2) 왼쪽외부조인
+3) 완전외부조인
+/* -------------------------------------------------- */
+
+-- [Quiz 1-02] 집계함수, 그룹화, 하위질의 (문제)
+R                S
+  A       B        C       D
+-----------     -----------
+  a       2        a        1
+  b      4         b       2
+  c      2         c       4
+  c      4     
+  c      6
+
+다음 실행결과는 무엇인가?
+/*-----------------------------------------------*/
+
+
+
+-----------------------------------------
+# [요약] 뷰(view): 가상의 테이블
+
+장점) 1) 보안성
+        2) 사용의 편의성
+-----------------------------------------
+/* ============================ */
+--  [Quiz] 집계함수/뷰 실습용
+/* ============================ */
+/*  [Quiz] 집계함수/뷰 실습용 */
+
+/*  [실습] 뷰 실습용: view */
+
+/*--------------고객 스키마 ---------------*/
+-- (MySQL)
+DROP TABLE if exists 고객;
+
+-- 고객(고객아이디,고객이름,나이,등급,직업,적립금)
+CREATE TABLE 고객 (
+      고객아이디   VARCHAR(20)             NOT NULL,
+      고객이름      VARCHAR(10),
+      나이            INT,
+      등급            VARCHAR(10)              NOT NULL,
+      직업            VARCHAR(20),
+      적립금         INT                            DEFAULT 0,
+      PRIMARY KEY(고객아이디)
+);
+
+INSERT INTO 고객 VALUES ('apple', '정소화', 20, 'gold', '학생', 1000);
+INSERT INTO 고객 VALUES ('banana', '김선우', 25, 'vip', '간호사', 2500);
+INSERT INTO 고객 VALUES ('carrot', '고명석', 28, 'gold', '교사', 4500);
+INSERT INTO 고객 VALUES ('orange', '김용축', 22, 'silver', '학생', NULL);
+INSERT INTO 고객 VALUES ('melon', '성원용', 35, 'gold', '회사원', 5000);
+INSERT INTO 고객 VALUES ('peach', '오형준', NULL, 'silver', '의사', 300);
+INSERT INTO 고객 VALUES ('pear', '채광주', 31, 'silver', '회사원', 500);
+
+select * from 고객;
+/*-----------------------------------------------*/
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 1) 다음 실행결과는 무엇인가
+SELECT COUNT(*), 
+          COUNT(적립금), 
+          COUNT(DISTINCT 직업)
+FROM   고객;
+
+
+-- 2) 뷰 작성: 고객_학생 뷰 생성
+-- 고객아이디, 등급, 직업,적립금 으로 이루어진다
+
+-- 뷰
+CREATE VIEW 고객_학생
+as
+  SELECT 고객아이디, 등급, 직업,적립금
+  FROM   고객
+  WHERE  직업 = '학생';
+
+-- 2) 다음 실행결과는 무엇인가?
+insert into 고객_학생 values('shinme','gold','학생',500);
+select * from 고객 where 고객아이디='shinme';
+--------------------------------------------------
+
+/* ============================ */
+--  [실습] 뷰 실습용  (교재 7장)
+/* ============================ */
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+/* ---------------------------------------------- */
+-- "데이터베이스개론", 김연희, 한빛, ch07
+-- (MySQL)
+-- handb 데이터베이스 존재할 경우, 데이터베이스 삭제
+drop database if exists handb;
+
+-- 교재 7장 스키마 생성
+CREATE DATABASE `handb` 
+  default character set utf8mb4;
+
+-- 사용할 데이터베이스 선택
+use handb;
+
+DROP TABLE if exists 주문;
+DROP TABLE if exists 고객;
+DROP TABLE if exists 제품;
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+CREATE TABLE 고객 (
+	고객아이디  VARCHAR(20)	NOT NULL,
+	고객이름    VARCHAR(10),
+	나이         INT,
+	등급         VARCHAR(10)	NOT NULL,
+	직업         VARCHAR(20),
+	적립금      INT	            DEFAULT 0,
+	PRIMARY KEY(고객아이디)
+);
+
+CREATE TABLE 제품 (
+	제품번호    CHAR(3)	NOT NULL,
+	제품명       VARCHAR(20),
+	재고량       INT,
+	단가         INT,
+	제조업체    VARCHAR(20),
+	PRIMARY KEY(제품번호)
+	-- CHECK (재고량 >= 0 AND 재고량 <= 10000)
+);
+
+CREATE TABLE 주문 (
+	주문번호    CHAR(3)	NOT NULL,
+	주문고객    VARCHAR(20),
+	주문제품    CHAR(3),
+	수량         INT,
+	배송지      VARCHAR(30),
+	주문일자    DATE,
+	PRIMARY KEY(주문번호),
+	FOREIGN KEY(주문고객) REFERENCES 고객(고객아이디),
+	FOREIGN KEY(주문제품) REFERENCES 제품(제품번호)
+);
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+INSERT INTO 고객 VALUES ('apple', '정소화', 20, 'gold', '학생', 1000);
+INSERT INTO 고객 VALUES ('banana', '김선우', 25, 'vip', '간호사', 2500);
+INSERT INTO 고객 VALUES ('carrot', '고명석', 28, 'gold', '교사', 4500);
+INSERT INTO 고객 VALUES ('orange', '김용욱', 22, 'silver', '학생', 0);
+INSERT INTO 고객 VALUES ('melon', '성원용', 35, 'gold', '회사원', 5000);
+INSERT INTO 고객 VALUES ('pear', '채광주', 31, 'silver', '회사원', 500);
+INSERT INTO 고객 VALUES ('peach', '오형준', NULL, 'silver', '의사', 300);
+
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+INSERT INTO 제품 VALUES ('p01', '그냥만두', 5000, 4500, '대한식품');
+INSERT INTO 제품 VALUES ('p02', '매운쫄면', 2500, 5500, '민국푸드');
+INSERT INTO 제품 VALUES ('p03', '쿵떡파이', 3600, 2600, '한빛제과');
+INSERT INTO 제품 VALUES ('p04', '맛난초콜렛', 1250, 2500, '한빛제과');
+INSERT INTO 제품 VALUES ('p05', '얼큰라면', 2200, 1200, '대한식품');
+INSERT INTO 제품 VALUES ('p06', '통통우동', 1000, 1550, '민국푸드');
+INSERT INTO 제품 VALUES ('p07', '달콤비스켓', 1650, 1500, '한빛제과');
+
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+INSERT INTO 주문 VALUES ('o01', 'apple', 'p03', 10, '서울시 마포구', '13/01/01');
+INSERT INTO 주문 VALUES ('o02', 'melon', 'p01', 5, '인천시 계양구', '13/01/10');
+INSERT INTO 주문 VALUES ('o03', 'banana', 'p06', 45, '경기도 부천시', '13/01/11');
+INSERT INTO 주문 VALUES ('o04', 'carrot', 'p02', 8, '부산시 금정구', '13/02/01');
+INSERT INTO 주문 VALUES ('o05', 'melon', 'p06', 36, '경기도 용인시', '13/02/20');
+INSERT INTO 주문 VALUES ('o06', 'banana', 'p01', 19, '충청북도 보은군', '13/03/02');
+INSERT INTO 주문 VALUES ('o07', 'apple', 'p03', 22, '서울시 영등포구', '13/03/15');
+INSERT INTO 주문 VALUES ('o08', 'pear', 'p02', 50, '강원도 춘천시', '13/04/10');
+INSERT INTO 주문 VALUES ('o09', 'banana', 'p04', 15, '전라남도 목포시', '13/04/11');
+INSERT INTO 주문 VALUES ('o10', 'carrot', 'p03', 20, '경기도 안양시', '13/05/22');
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+select * from 고객;
+select * from 제품;
+select * from 주문;
+
+/* --------------------------------------------- */
+-- (수정) 예제7-55 고객 테이블에서 등급이 vip인 
+-- 고객의 고객아이디, 고객이름, 나이, 등급으로 구성된
+-- 뷰를 우수고객이라는 이름으로 생성해보자
+-- 우수고객 뷰의 모든 내용을 검색해보자
+-- (WITH CHECK OPTION 사용)
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 우수고객(고객아이디, 고객이름, 나이, 등급)
+
+select * from 고객;
+
+CREATE VIEW 우수고객(고객아이디, 고객이름, 나이, 등급)
+as
+ SELECT  고객아이디, 고객이름, 나이, 등급
+ FROM    고객
+ WHERE   등급 = 'vip'
+WITH CHECK OPTION;
+
+select * from 우수고객;
+
+-- 뷰에 입력/수정/삭제 시도
+insert into 우수고객(고객아이디, 고객이름, 나이, 등급)
+values('shinmi','신아로미',20,'gold');
+
+update 우수고객
+set   등급 = 'gold'
+where 고객아이디 = 'banana';
+
+delete 
+from   우수고객
+where 고객아이디 = 'banana';
+
+/* ============================ */
+-- 예제7-57 우수고객 뷰에서 
+-- 나이가 20세 이상인 고객에 대한 모든 내용을 검색해보자
+
+/* ============================ */
+--  [실습] 뷰 실습용
+/* ============================ */
+/*-----------------------------------------------*/
+-- 3단계 스키마 구조
+drop table 가입고객;
+
+CREATE TABLE 가입고객 (
+    번호  int	NOT NULL,
+    이름  char(10),
+    성별  char(2) ,
+    나이  int ,
+    직업  char(10),
+    주소  char(20) ,
+    연락처 char(20) ,
+    PRIMARY KEY(번호)
+);
+
+INSERT INTO 가입고객 VALUES (1, '홍길동', '남', 20, '학생', '서울', NULL) ,
+                        (2, '임꺽정', '남', 22, '학생', '인천', '010-1111-1111') , 
+                        (3, '신아로미', '여', 20, '학생', '서울', '010-2222-2222') 
+;
+/*-----------------------------------------------*/
+
+/* ============================ */
+--  [실습] 뷰 실습
+/* ============================ */
+
+-- [실습] 
+-- 다음 실행결과는 무엇인가
+
+-- 뷰 생성
+CREATE VIEW 고객분석팀
+as 
+  SELECT 성별, 나이, 직업
+  FROM   가입고객;
+
+select * from 고객분석팀;
+
+
+CREATE VIEW 상품배송팀(고객번호,고객이름,주소,연락처)
+as 
+  SELECT 번호, 이름, 주소, 연락처
+  FROM   가입고객;
+
+select * from 상품배송팀;
+--------------------------------------------------
+[실습] 뷰
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 우수고객(고객아이디, 고객이름, 나이, 등급)
+
+-- 4.1 뷰
+
+-- 4.2 뷰의 생성
+
+-- (수정) 예제7-55 고객 테이블에서 등급이 vip인 고객의 고객아이디, 고객이름, 나이, 등급으로 구성된
+-- 뷰를 우수고객이라는 이름으로 생성해보자
+-- 우수고객 뷰의 모든 내용을 검색해보자
+
+CREATE VIEW 우수고객(고객아이디, 고객이름, 나이, 등급)
+as
+ 
+
+
+
+WITH CHECK OPTION;
+
+select * from 우수고객;
+
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 우수고객(고객아이디, 고객이름, 나이, 등급)
+
+select * from 고객;
+
+select * from 우수고객;
+
+-- 뷰에 입력/수정/삭제 시도
+insert into 우수고객(고객아이디, 고객이름, 나이, 등급)
+values('shinmi','신아로미',20,'gold');
+
+update 우수고객
+set   등급 = 'gold'
+where 고객아이디 = 'banana';
+
+delete 
+from   우수고객
+where 고객아이디 = 'banana';
+
+-- 예제7-56 제품 테이블에서 제조업체별 제품수로 구성된 뷰를 
+-- 업체별제품수라는 이름으로 생성해보자
+-- 업체별제품수 뷰의 모든 내용을 검색해보자
+
+CREATE VIEW 업체별제품수(제조업체, 제품수)
+as
+ SELECT  제조업체, COUNT(*)
+ FROM    제품
+ GROUP BY 제조업체
+WITH CHECK OPTION;
+
+select * from 업체별제품수;
+
+-- 4.3 뷰의 활용
+
+-- 예제7-57 우수고객 뷰에서 나이가 25세 이상인 고객에 대한 모든 내용을 검색해보자
+
+SELECT *
+FROM   우수고객
+WHERE  나이 >= 25;
+
+select 고객아이디, 고객이름, 나이, 등급 
+from   고객
+where  등급 = 'vip'
+  AND  나이 >= 25;
+
+
+-- 예제7-58 제품번호가 p08, 재고량이 1000, 제조업체가 신선식품인 새로운 제품의 정보를
+-- 제품1 뷰에 삽입해보자.
+-- 제품1 뷰에 있는 모든 내용을 검색해보자 
+
+drop view 제품1;
+
+CREATE VIEW 제품1
+as
+ SELECT  제품번호, 재고량, 제조업체
+ FROM    제품;
+
+select * from 제품1;
+
+select * from 제품;
+
+insert into 제품1 values('p08',1000,'신선식품'); 
+
+-- 기본키 제외한 필드로 제품2 뷰 생성
+drop view 제품2;
+
+CREATE VIEW 제품2
+as
+ SELECT  제품명, 재고량, 제조업체
+ FROM    제품;
+
+select * from 제품2;
+
+select * from 제품;
+
+-- 오류
+insert into 제품2 values('사원냉면',1000,'신선식품'); 
+
+-- 4.4 뷰의 삭제
+
+-- 예제7-59 우수고객 뷰를 삭제하되, 
+-- 우수고객 뷰를 이용하는 다른 뷰가 존재하면
+-- 삭제가 수행되지 않도록 한다
+
+------------------------------------
+
+
+-----------------------------------------
+[Quiz] 조인
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+[과제3] [실습2-3]
+
+-- [Quiz 1-01] 외부조인
+omember                   group_ex
+   id    groupid                groupid   position
+---------------------        ------------------------
+   100    A                         A           서울
+   101    B                         B            대구
+   102    A                         C            광주
+   102    F                          D           부산
+                                       E            대전
+/*--------------------------------------------------------*/
+drop table if exists omember;
+drop table if exists group_ex;
+
+CREATE TABLE omember ( 
+   id        CHAR(3)     NOT NULL ,
+   groupid CHAR(1)
+);
+
+CREATE TABLE group_ex ( 
+   groupid   CHAR(1)   NOT NULL ,
+   position   VARCHAR(12)
+);
+
+INSERT INTO omember VALUES('100', 'A');
+INSERT INTO omember VALUES('101', 'B');
+INSERT INTO omember VALUES('102', 'A');
+INSERT INTO omember VALUES('102', 'F');
+
+INSERT INTO group_ex VALUES('A', '서울');
+INSERT INTO group_ex VALUES('B', '대구');
+INSERT INTO group_ex VALUES('C', '광주');
+INSERT INTO group_ex VALUES('D', '부산');
+INSERT INTO group_ex VALUES('E', '대전');
+
+SELECT * FROM omember;
+SELECT * FROM group_ex;
+/*--------------------------------------------------------*/
+
+-- [Quiz 1-02] 외부조인
+다음을 관계대수로 나타내고 SQL과 실행결과를 작성하라
+
+emp                         project  
+   ename  pno                 pno      pname
+   -------------                 -----------------
+   홍길동  101                  101     작전중
+   임꺽정  102                  102     특공대
+   박찬호  101                  103     유레카
+   박찬호  103                  104     다모여
+   신동엽  NULL
+
+-- 2-1) 사원 테이블과 프로젝트 테이블에 대해 왼쪽외부조인 질의를 수행하라
+-- 2-2) 사원 테이블과 프로젝트 테이블에 대해 오른쪽외부조인 질의를 수행하라
+-- 2-3) 사원 테이블과 프로젝트 테이블에 대해 완전외부조인 질의를 수행하라
+--------------------------------------------------
+-- 다음 실행결과를 노트에 작성하라
+
+1) 내부조인(동등조인: equi join)
+2) 내부조인(자연조인: Natural join)
+
+3) 왼쪽외부조인
+4) 오른쪽외부조인
+5) 완전외부조인
+--------------------------------------------------
+-- 2-1) 왼쪽외부조인
+select  *
+from   emp LEFT OUTER JOIN project
+on      emp.pno = project.pno;
+
+-- 2-2) 오른쪽외부조인
+select  *
+from   emp RIGHT OUTER JOIN project
+on      emp.pno = project.pno;
+
+-- 2-3) 완전외부조인
+select  *
+from   emp FULL OUTER JOIN project
+on      emp.pno = project.pno;
+
+--------------------------------------------------
+/*--------------------------------------------------------*/
+/* 외부조인 실습용 (outerjoin02-mysql.sql) */
+
+drop table if exists emp;
+drop table if exists project;
+
+CREATE TABLE emp ( 
+    ename    VARCHAR(12)  NOT NULL ,
+    pno       int
+);
+
+CREATE TABLE project ( 
+   pno        int                  NOT NULL ,
+   pname    VARCHAR(20)
+);
+
+INSERT INTO emp VALUES('홍길동', 101);
+INSERT INTO emp VALUES('임꺽정', 102);
+INSERT INTO emp VALUES('박찬호', 101);
+INSERT INTO emp VALUES('박찬호', 103);
+INSERT INTO emp VALUES('신동엽', NULL);
+
+INSERT INTO project VALUES(101, '작전중');
+INSERT INTO project VALUES(102, '특공대');
+INSERT INTO project VALUES(103, '유레카');
+INSERT INTO project VALUES(104, '다모여');
+
+SELECT * FROM emp;
+SELECT * FROM project;
+/*--------------------------------------------------------*/
+
+
+/* --------------------------------------------- */
+[실습 3] (테이블 3걔)
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+
+-- (ans)
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호;
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호
+  AND    학생명 = '이홍근';
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호
+    WHERE 학생명 = '이홍근';
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생 LEFT OUTER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             LEFT OUTER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+/*-----------------------------------------------*/
+-- (three-join-k-mysql.sql)
+
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+drop table if exists 수강;
+drop table if exists 학생;
+drop table if exists 과목;
+
+create table 학생 (
+   학번     char(5),
+   학생명  varchar(12),
+   primary key(학번)
+);
+
+create table 과목 (
+   과목번호  char(5),
+   과목명  varchar(30),
+   primary key(과목번호)
+);
+ 
+create table 수강 (
+   학번 char(5),
+   과목번호  char(5),
+   성적 int,
+   primary key(학번, 과목번호),
+   foreign key (학번) references 학생(학번),
+   foreign key (과목번호) references 과목(과목번호)
+);
+
+insert into 학생 values('11002','이홍근');
+insert into 학생 values('24036','김순미');
+insert into 학생 values('30419','박상웅');
+insert into 학생 values('30555','홍서범');
+insert into 학생 values('31890','유동희');
+insert into 학생 values('31892','이정무');
+insert into 학생 values('32000','김윤식');
+
+insert into 과목 values('CS310','데이터베이스');
+insert into 과목 values('CS313','운영체제');
+insert into 과목 values('CS345','자료구조');
+insert into 과목 values('CS326','자바');
+insert into 과목 values('CS546','DB프로그래밍');
+insert into 과목 values('CS378','멀티미디어');
+insert into 과목 values('CS388','웹프로그래밍');
+
+insert into 수강 values('11002','CS310',98);
+insert into 수강 values('11002','CS313',88);
+insert into 수강 values('24036','CS345',90);
+insert into 수강 values('30419','CS326',78);
+insert into 수강 values('31892','CS388',86);
+insert into 수강 values('32000','CS378',94);
+insert into 수강 values('31890','CS310',92);
+
+select * from 학생;
+select * from 과목;
+select * from 수강;
+/*-----------------------------------------------*/
+
+==============================
+# [요약] 서브쿼리(sub query), 부속질의, 부질의
+
+하위질의 -> 서브 쿼리 (Sub query, 하위질의, 부질의, 중첩질의, 상관중첩질의)
+
+--ANY 서브쿼리의 여러 개의 결과 중 한가지만 만족해도 되며
+--ALL 서브쿼리의 여러 개의 결과를 모두 만족시켜야 된다
+--SOME 은 ANY 와 동일한 의미
+--=ANY 는 IN 과 동일한 의미
+
+ALL: 하위질의의 모든 결과에 대해 조건 수식이 참인 경우 결과를 반환
+SOME: 하위질의의 한 개 이상의 결과에 대해 조건 수식이 참인 경우 결과를 반환
+ANY: SOME 과 동일
+
+IN 는 =ANY 와 동일, NOT IN 은 <>ALL 과 동일하다
+-----------------------------------------
+(중첩질의) 
+
+--하위질의(sub query)
+
+
+
+--department(deptno, deptname, floor)
+--employee(empno, empname, title, manager, salary, dno)
+
+select * from department;
+select * from employee;
+
+
+
+-- 20) 박영권과 같은 직급을 갖는 모든 사원들의 이름과 직급을 검색하라
+
+-- 21) 영업부나 개발부에 근무하는 사원들의 이름을 검색하라(IN 사용)
+
+-- 22) 영업부나 개발부에 근무하는 사원들의 이름을 검색하라(EXISTS 사용)
+ 
+-- [추가문제]
+-- 영업부나 개발부에 근무하지 않는 사원들의 이름을 검색하라(NOT IN 사용)
+
+-- 24) 사원들이 한 명도 소속되지 않은 부서명을 검색하라 (NOT EXISTS 사용)
+select  deptname
+from   department D
+where  NOT EXISTS (select *
+                    from   employee E
+                    where  D.deptno = E.dno);
+
+--상관중첩질의
+--25) 자신이 속한 부서의 사원들의 평균급여보다 많은 급여를 받는 사원들에 대해서 
+--이름, 부서번호, 급여를 검색하라 (상관중첩질의)
+select empname, dno, salary
+from employee E
+where salary > (select AVG(salary)
+               from   employee 
+               where  E.dno = employee.dno);
+
+----------------------------
+중첩질의 (stu, prof) (quiz6-lectDB-SELECT-subquery)
+
+-- stu(sno, sname, dept, sage)
+-- pro(pno, pname, dept, page)
+
+
+-- 3-1) 교수 테이블에서 이정무 의 학과와 같은 학생 이름, 학과, 나이를 검색하라
+-- 3-2) 교수 테이블에서 pno 가 p1 이거나 p2 인 학과와 같은 학생 이름, 학과, 나이를 검색하라
+
+-- 3-3) 학생 테이블과 교수 테이블에서 모든 학생들보다 나이가 많은 교수의
+-- 교번, 이름, 나이를 ALL 구문을 이용하여 검색하라
+-- 3-4) 학생 테이블과 교수 테이블에서 한 명 이상 교수보다 
+-- 나이가 많은 학생이 있을 경우 학생의 학번, 이름, 나이를 SOME 구문으로 검색하라
+
+-- 3-5) 가장 나이가 많은 학생의 이름, 나이를 검색하라
+-- 3-6) 각 학과마다 가장 나이가 많은 학생의 이름, 학과, 나이를 검색하라
+------------------------------------------------
+
+--3-1) 교수 테이블에서 이정무 의 학과 와 같은 학생이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  dept = (select dept
+               from   prof
+               where  pname = '이정무');
+--3-2) 교수 테이블에서 pno 가 p1 이거나 p2 인 학과 와 같은 학생이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  dept IN (select dept
+                from   prof
+                where  pno IN ('p1', 'p2'));
+--3-3) 학생 테이블과 교수 테이블에서 모든 학생들보다 나이가 많은 교수의
+--교번, 이름, 나이를 ALL 구문을 이용하여 검색하라
+select pno, pname,page
+from   prof
+where  page >ALL (select sage
+                   from   stu);
+--3-4) 학생 테이블과 교수 테이블에서 한 명 이상 교수보다 
+--나이가 많은 학생이 있을 경우 학생의 학번, 이름, 나이를 SOME 구문으로 검색하라
+select sno, sname, sage
+from   stu
+where  sage >SOME (select page
+                     from   prof);
+
+--3-5) 가장 나이가 많은 학생 이름, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  sage = (select MAX(sage)
+               from   stu);
+
+
+--3-6) 각 학과마다 가장 나이가 많은 학생 이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu S1
+where  sage IN (select MAX(sage)
+                from   stu S2
+                where  S1.dept = S2.dept);
+
+----------------------------------------------
+
+
+
+
+/* --------------------------------------------- */
+[실습 3] (테이블 3걔)
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+
+-- (ans)
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호;
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호
+  AND    학생명 = '이홍근';
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호
+    WHERE 학생명 = '이홍근';
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생 LEFT OUTER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             LEFT OUTER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+/*-----------------------------------------------*/
+-- (three-join-k-mysql.sql)
+
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+drop table if exists 수강;
+drop table if exists 학생;
+drop table if exists 과목;
+
+create table 학생 (
+   학번     char(5),
+   학생명  varchar(12),
+   primary key(학번)
+);
+
+create table 과목 (
+   과목번호  char(5),
+   과목명  varchar(30),
+   primary key(과목번호)
+);
+ 
+create table 수강 (
+   학번 char(5),
+   과목번호  char(5),
+   성적 int,
+   primary key(학번, 과목번호),
+   foreign key (학번) references 학생(학번),
+   foreign key (과목번호) references 과목(과목번호)
+);
+
+insert into 학생 values('11002','이홍근');
+insert into 학생 values('24036','김순미');
+insert into 학생 values('30419','박상웅');
+insert into 학생 values('30555','홍서범');
+insert into 학생 values('31890','유동희');
+insert into 학생 values('31892','이정무');
+insert into 학생 values('32000','김윤식');
+
+insert into 과목 values('CS310','데이터베이스');
+insert into 과목 values('CS313','운영체제');
+insert into 과목 values('CS345','자료구조');
+insert into 과목 values('CS326','자바');
+insert into 과목 values('CS546','DB프로그래밍');
+insert into 과목 values('CS378','멀티미디어');
+insert into 과목 values('CS388','웹프로그래밍');
+
+insert into 수강 values('11002','CS310',98);
+insert into 수강 values('11002','CS313',88);
+insert into 수강 values('24036','CS345',90);
+insert into 수강 values('30419','CS326',78);
+insert into 수강 values('31892','CS388',86);
+insert into 수강 values('32000','CS378',94);
+insert into 수강 values('31890','CS310',92);
+
+select * from 학생;
+select * from 과목;
+select * from 수강;
+/*-----------------------------------------------*/
+
+
+
+==============================
+[Quiz] 14주차
+==============================
+-- 환자(환자번호,환자이름,나이,담당의사)
+-- 의사(의사번호,의사이름,소속,근무연수)
+
+-- 3) 다음 SQL문법을 작성하시오
+-- 3-1) D001 의사가 담당하고 나이가 30세 이상인 환자의 환자번호와 환자이름을 검색하라
+-- 3-2) 소속별로 의사수와 평균 근무연수를 검색하라
+-- 3-3) 김용욱 환자를 담당하는 의사의 의사이름과 소속, 근무연수를 검색하라
+-- 3-3-1) (하위질의 사용)
+-- 3-3-2) (조인 사용)
+/*-----------------------------------------------*/
+-- (MySQL )
+drop database if exists sampledb;
+
+CREATE DATABASE `sampledb` 
+  default character set utf8mb4;
+
+USE testdb;
+
+DROP TABLE if exists 환자;
+DROP TABLE if exists 의사;
+
+-- 의사(의사번호, 의사이름, 소속, 근무연수)
+-- 환자(환자번호, 환자이름, 나이, 담당의사)
+
+CREATE TABLE 의사 (
+    의사번호       char(4)        NOT NULL  ,
+    의사이름       varchar(20)  ,
+    소속             varchar(30)   DEFAULT '내과' ,
+    근무연수       int              CHECK (근무연수>=1 AND 근무연수 <=50),
+    PRIMARY KEY(의사번호)
+);
+
+CREATE TABLE 환자 (
+    환자번호       char(4)        NOT NULL  ,
+    환자이름       varchar(20)  NOT NULL  ,
+    나이            int ,
+    담당의사       char(4)    ,
+    PRIMARY KEY(환자번호) ,
+    FOREIGN KEY(담당의사) REFERENCES 의사(의사번호)
+);
+
+-- 의사(의사번호, 의사이름, 소속, 근무연수)
+INSERT INTO 의사 VALUES('D001','정지영','내과',5);
+INSERT INTO 의사 VALUES('D002','김선주','피부과',10);
+INSERT INTO 의사 VALUES('D003','정성호','정형외과',15);
+
+-- 환자(환자번호, 환자이름, 나이, 담당의사)
+INSERT INTO 환자 VALUES('P001','오우진',31,'D002');
+INSERT INTO 환자 VALUES('P002','채광주',50,'D001');
+INSERT INTO 환자 VALUES('P003','김용욱',43,'D003');
+
+-- 데이터 조회
+select * from 의사;
+select * from 환자;
+/*-----------------------------------------------*/
+
+
