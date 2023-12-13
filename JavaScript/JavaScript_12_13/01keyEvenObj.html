@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        
+        const star = document.querySelector('h1')
+        star.style.position = 'absolute'
+
+        let x=0,y=0;
+        const block = 20;
+
+        const print = () => {
+          star.style.left = `${x * block}px`;
+          star.style.top = `${y * block}px`;
+        }
+        print();
+
+        document.body.addEventListener('keydown', (event) => {
+          switch (event.keyCode) {
+            case 37: //left
+              x -= 1
+              break
+            case 38: //up
+              y == 1
+              break
+            case 39: //right
+              x += 1
+              break
+            case 40: //down
+              y += 1
+              break
+          }
+          print()
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <h1>★</h1>
+  </body>
+</html>
