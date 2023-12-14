@@ -1,10 +1,10 @@
 import java.util.*;
 
 interface StudentInterface{
-		public static final String SW="ÄÄ°øºÎ ÄÄ¼Ò°ú";
-		public static final String AI="ÄÄ°øºÎ ÀÎ°øÁö´ÉÇÐ°ú";
-		public static final String ECO="°æ¿µÇÐºÎ °æ¿µÇÐ°ú";
-		public static final String DES="µðÀÚÀÎÇÐºÎ »ýÈ°µðÀÚÀÎ°ú";
+		public static final String SW="ì»´ê³µë¶€ ì»´ì†Œê³¼";
+		public static final String AI="ì»´ê³µë¶€ ì¸ê³µì§€ëŠ¥í•™ê³¼";
+		public static final String ECO="ê²½ì˜í•™ë¶€ ê²½ì˜í•™ê³¼";
+		public static final String DES="ë””ìžì¸í•™ë¶€ ìƒí™œë””ìžì¸ê³¼";
 		
 		String getResult();
 		String getDept();
@@ -53,13 +53,45 @@ class Student extends Person implements StudentInterface{
 		this.grade = grade;
 		this.major = major;
 	}
+	
+	
+	public int getSt_id() {
+		return st_id;
+	}
+
+
+	public void setSt_id(int st_id) {
+		this.st_id = st_id;
+	}
+
+
+	public int getGrade() {
+		return grade;
+	}
+
+
+	public void setGrade(int grade) {
+		this.grade = grade;
+	}
+
+
+	public int getMajor() {
+		return major;
+	}
+
+
+	public void setMajor(int major) {
+		this.major = major;
+	}
+
+
 	@Override
 	public String getResult() {
 		if(grade >= 80) {
-			return "Âü ÀßÇß¾î¿ä";
+			return "ì°¸ ìž˜í–ˆì–´ìš”";
 		}
 		else {
-			return "¤¢¤²";
+			return "ã„²ã…‚";
 		}
 	}
 	@Override
@@ -73,7 +105,7 @@ class Student extends Person implements StudentInterface{
 		if(major == 1200) return Student.AI;
 		if(major == 1300) return Student.DES;
 		if(major == 1400) return Student.ECO;
-		return "±âÅ¸ ÇÐ°ú";
+		return "ê¸°íƒ€ í•™ê³¼";
 	}
 	
 }
@@ -82,16 +114,23 @@ public class PrintStudent {
 	
 	public static void main(String[] args) {
 		ArrayList<Student> mylist = new ArrayList();
-		Student s1 = new Student("¾È¼öÈ¯", "ºÎÃµ",1 ,90 ,1100);
-		Student s2 = new Student("±Ç¼öÈ¯", "±¤¸í",2 ,100 ,1100);
-		Student s3 = new Student("¾ÈÁøÈ£", "ºÎÃµ",3 ,60 ,1200);
-		Student s4 = new Student("±èµµÇö", "ÀÏº»",4 ,1 ,1300);
+		Student s1 = new Student("ì•ˆìˆ˜í™˜", "ë¶€ì²œ",1 ,90 ,1100);
+		Student s2 = new Student("ê¶Œìˆ˜í™˜", "ê´‘ëª…",2 ,100 ,1100);
+		Student s3 = new Student("ì•ˆì§„í˜¸", "ë¶€ì²œ",3 ,60 ,1200);
+		Student s4 = new Student("ê¹€ë„í˜„", "ì¼ë³¸",4 ,1 ,1300);
 		mylist.add(s1);
 		mylist.add(s2);
 		mylist.add(s3);
 		mylist.add(s4);
 		for(Student arr : mylist) {
-			System.out.println(arr);
+			if(arr.getGrade() >= 80) {
+				System.out.println(arr.getName() + ", " + arr.getResult() + " <- ìš°ìˆ˜ ì„±ì  í•™ìƒ");
+			}
+		}
+		for(Student arr : mylist) {
+			if(arr.getAddr() == "ì¼ë³¸") {
+				System.out.println(arr.getName() + " <-- ì´ë¶„ ì¼ë³¸ ì‚¬ëžŒìž„");
+			}
 		}
 	}
 
