@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Events and Dynamic Creation</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const createButton = document.getElementById('createButton');
+            const dynamicContentArea = document.getElementById('dynamicContentArea');
+
+            createButton.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    const newParagraph = document.createElement('p');//p태그 추가
+                    newParagraph.textContent = '새로운 단락이 추가되었습니다!';//p태그에 txt형식의 문자열 삽입
+                    dynamicContentArea.appendChild(newParagraph);//appendChild를 사용해서 태그 삽입
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <button id="createButton">엔터 키로 콘텐츠 추가</button>
+    <div id="dynamicContentArea"></div>
+</body>
+
+</html>

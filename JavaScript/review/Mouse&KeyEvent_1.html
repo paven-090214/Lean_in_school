@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Events and Movement</title>
+    <style>
+        #movableDiv {
+            width: 100px;
+            height: 100px;
+            background-color: lightcoral;
+            position: absolute;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const movableDiv = document.getElementById('movableDiv');
+        let isDragging = false;
+
+        movableDiv.addEventListener('mousedown', () => {
+        isDragging = true;
+        
+        // mousedown 이벤트가 발생하면 mousemove 이벤트를 추가로 등록
+        document.addEventListener('mousemove', moveHandler);
+        });
+
+        document.addEventListener('mouseup', () => {
+        isDragging = false;
+
+        // mouseup 이벤트가 발생하면 mousemove 이벤트 핸들러를 제거
+        document.removeEventListener('mousemove', moveHandler);
+        movableDiv.style.backgroundColor='lightcoral';
+        });
+        //isDragging이 참일 경우 마우스포인터에 CSS가 따라가도록 만드는 함수
+        function moveHandler(event) {
+            if (isDragging) {
+                movableDiv.style.backgroundColor = 'black';
+                movableDiv.style.left = `${event.clientX - 50}px`;
+                movableDiv.style.top = `${event.clientY - 50}px`;
+            }
+            
+        }
+            
+            function move(){
+                movableDiv.style.left = `${event.clientX - 50}px`;
+                movableDiv.style.top = `${event.clientY - 50}px`;
+            }
+            // 키보드 이벤트 처리
+            document.addEventListener('keydown', (event) => {
+                // 화살표 키를 눌렀을 때
+                switch (event.key) {
+                    case 'ArrowUp':
+                        movableDiv.style.top = `${parseInt(movableDiv.style.top) - 10}px`;
+                        break;
+                    case 'ArrowDown':
+                        movableDiv.style.top = `${parseInt(movableDiv.style.top) + 10}px`;
+                        break;
+                    case 'ArrowLeft':
+                        movableDiv.style.left = `${parseInt(movableDiv.style.left) - 10}px`;
+                        break;
+                    case 'ArrowRight':
+                        movableDiv.style.left = `${parseInt(movableDiv.style.left) + 10}px`;
+                        break;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="movableDiv"></div>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Events and Style Change</title>
+    <style>
+        #textBox {
+            width: 300px;
+            height: 30px;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textBox = document.getElementById('textBox');
+            const background = document.querySelector('body');
+
+            background.addEventListener('keydown',(event) =>{
+                if(event.key === 'Backspace'){
+                    background.style.backgroundColor = 'red';
+                }
+            })
+
+            background.addEventListener('keyup', ()=>{
+                background.style.backgroundColor = 'white';
+            })
+
+            textBox.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    textBox.style.backgroundColor = 'lightblue';
+                }
+            });
+            
+            background.addEventListener('keydown',(event) =>{
+                if(event.key === 'ArrowUp'){
+                    textBox.style.backgroundColor = 'green';
+                }
+            })
+            textBox.addEventListener('keyup', () => {
+                textBox.style.backgroundColor = 'white';
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+    <input type="text" id="textBox" placeholder="엔터 키로 텍스트박스의 배경색 변경">
+    <p>화살표 위 표시 : 배경색 변경</p>
+    <p>백스페이스 : 배경 빨간색으로 변경</p>
+</body>
+
+</html>
