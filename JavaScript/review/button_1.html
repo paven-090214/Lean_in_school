@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const printBtn = document.querySelector('#print');
+            var gameArea = document.getElementById('gameArea_1');
+            var gameArea1 = document.getElementById('gameArea_2');
+            var gameArea2 = document.getElementById('gameArea_3');
+            let counter = 0;
+
+            printBtn.addEventListener('click', ()=>{
+                gameArea.innerHTML = "안수환";
+                gameArea1.innerHTML = `<button id="counterBtn">클릭</button>`;
+                gameArea2.innerHTML = `클릭 횟수 : ${counter}`;
+                counterBtn.addEventListener('click', ()=>{
+                    counter++;
+                    gameArea2.innerHTML = `클릭 횟수 : ${counter}`;
+                })
+            });
+        })
+    </script>
+</head>
+<body>
+    <h1>안녕하세요.</h1>
+    <button id="print">출력</button>
+    <p id="gameArea_1"></p>
+    <div id="gameArea_2"></div>
+    <div id="gameArea_3"></div>
+</body>
+</html>
