@@ -75,8 +75,26 @@ balance = deposit(2000)
 balance = withdraw(1000)
 balance = deposit(2000)
 ```
-### (LAB 1-5 – 내친김에 - 심화 과제) 
+### (LAB 1-6 – (이왕에 그냥 가보자!!! - 심화 과제) 
 지역 변수만을 사용하여 잔액을 관리하는 함수형 프로그래밍 방식
 ```python
+class BankAccount:
+    def __init__ (self, initial_balance = 1000) :
+        self.balance = initial_balance
+    
+    def deposit (self, amount) :
+        self.balance += amount
+        print(f'{amount}원 입금되었습니다. 현재 잔액 : {self.balance}원')
+
+    def withdraw(self, amount):
+        if self.balance < amount :
+            print('잔액이 부족합니다.')
+        else :
+            self.balance -= amount
+            print(f'{amount}원이 출금되었습니다. 현재 잔액 : {self.balance}원')
+
+KB_Bank = BankAccount()
+KB_Bank.deposit(5000)
+KB_Bank.withdraw(10000)
 
 ```
