@@ -1,144 +1,163 @@
-import React, { useState } from "react";
 import "./App.css";
+import {useState} from "react";
 
-export default function App() {
+export default function Calendar() {
   const today = new Date();
-
-  const [currentDate, setCurrentDate] = useState(today);
-  const [userSelect, setUserSelect] = useState(today);
+  const [page, setPage] = useState(today);
   const [userInput, setUserInput] = useState("");
-  const [todoList, setTodolist] = useState([]);
+  const [todoList, setTodoList] = useState([]);
+  const [selectDay, setSelectDay] = useState(today);
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const day = ["일", "월", "화", "수", "목", "금", "토"];
+  
+  const year = page.getFullYear();
+  const month = page.getMonth();
 
   const first_day = new Date(year, month, 1).getDay();
-  const last_date = new Date(year, month + 1, 0).getDate();
+  const last_day = new Date(year, month + 1, 0).getDate();
 
-  const changeMonth = (offset) => {
-    setCurrentDate(new Date(year, month + offset, 1));
-  };
-
-  const handleDateClick = (userClick) => {
-    if (!userClick) {
-      return;
-    }
-
-    setUserSelect(new Date(year, month, userClick));
-  };
-
-  const day = [];
-
-  for (let i = 0; i < first_day; i++) {
-    day.push(null);
+  const days = []
+  for (let i = 0; i < first_day; i ++) {
+    days.push(null)
   }
 
-  for (let i = 1; i <= last_date; i++) {
-    day.push(i);
+  for (let i = 1; i <= last_day; i++) {
+    days.push(i)
   }
 
-  while (day.length % 7 !== 0) {
-    day.push(null);
+  while (days.length % 7 != 0) {
+    days.push(null)
   }
 
   const week = [];
-
-  for (let i = 0; i < day.length; i += 7) {
-    week.push(day.slice(i, i + 7));
+  for (let i = 0; i < days.length; i += 7) {
+    week.push(days.slice(i, i + 7));
   }
   
-    const formatDate=(date) =>{
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
+  const formatDate =(date)=>{
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  const selectedDateKey =formatDate(selectDay);
+  const addTodo =()=>{
+    if(!userInput.trim()) {
+      return;
     }
-
-  const addList =()=>{
     const newObj = {
-      date : formatDate(userSelect),
-      index : Date.now(),
-      todo : userInput,
       done : false,
-    };
-    setTodolist([...todoList,newObj]);
+      text : userInput,
+      index : Date.now(),
+      date : selectedDateKey,
+    }
+    setTodoList([...todoList, newObj]);
     setUserInput("");
   }
-  const toggleCheck=(date)=>{
-    const newArr = todoList.map((object)=>(
-      date == object.index ? {...object, done : !object.done} : object
-    ))
-    setTodolist(newArr);
+
+  const changeMonth=(offset)=>{
+    setPage(new Date(year, month + offset, 1));
+  }
+
+  const userHandle=(id)=>{
+    if (!id) {
+      return;
+    }
+    setSelectDay(new Date(year, month, id));
+    setUserInput("");
+  }
+
+  const toggle=(key)=>{
+    setTodoList(
+      todoList.map((obj)=>(
+        obj.index == key ? {...obj, done : !obj.done} : obj
+      ))
+    )
   }
 
   const remove=(key)=>{
-    const newArr = todoList.filter((obj)=>key != obj.index)
-    setTodolist(newArr)
+    setTodoList(
+      todoList.filter((obj)=>
+        obj.index != key
+      )
+    )
   }
 
-  
-  
-  const groupedTodo = todoList.reduce((groups, todo)=>{
-    if(!groups[todo.date]) {
-      groups[todo.date] = [];
+  const hasTodo=(day)=>{
+    if(!day) {
+      return false;
     }
-    groups[todo.date].push(todo);
-    return groups;
-  },{});
+    const key = formatDate(new Date(year, month, day));
+    return todoList.some((event)=>event.date === key);
+  }
+
+  const groupedTodo = todoList.reduce((group, todo)=>{
+    if (group[todo.date] == null) {
+      group[todo.date] = [];
+    }
+    group[todo.date].push(todo)
+    return group;
+  }, {})
+
 
   return(
-    <div>
-      <h1>{year}년 {month + 1}월</h1>
-      <div className="layout">
-        <section className="left-panel">
-          <button onClick={()=>changeMonth(-1)}>⬅️</button>
-          <button onClick={()=>changeMonth(1)}>➡️</button>
-          {/*달력 출력*/}
-          <table>
-            <thead>
-              <tr>
-                {days.map((days, index) =>(
-                  <td key={index}>{days}</td>
+    <div title="Calendar">
+      <h1>나의 달력</h1>
+      <h2>{page.getFullYear()}년 {page.getMonth() + 1}월</h2>
+      <section title="left">
+        <button onClick={()=>changeMonth(-1)}>◀️</button>
+        <button onClick={()=>changeMonth(1)}>▶️</button>
+        <table>
+          <thead>
+            <tr>
+              {day.map((day, index)=>(
+                <th key={index}>{day}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {week.map((week, week_index) =>(
+              <tr key={week_index}>
+                {week.map((days, days_index)=>(
+                  <td key={days_index} onClick={()=>userHandle(days)}>
+                    {days}
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {week.map((week_date, weekNum)=>(
-                <tr key={weekNum}>
-                  {week_date.map((date, dateNum)=>(
-                    <td 
-                    className="dates" 
-                    key={dateNum}
-                    onClick={()=>handleDateClick(date)}>
-                      {date}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-            </table>
-            <div className="input_box">
-              <h3>선택된 날짜 : {userSelect.getFullYear()}년 {userSelect.getMonth() + 1}월 {userSelect.getDate()}일</h3>
-              <input type="text" value={userInput} onChange={(e=>setUserInput(e.target.value))}/>
-              <button onClick={addList}>일정 추가</button>
-            </div>
-        </section>
-        <section className="right-panel">
-          <h2>일정</h2>
-            {Object.entries(groupedTodo).map(([date, todos])=>(
-              <div key={userTodo.index}>
-                <label><input type="checkbox" onChange={()=>toggleCheck(userTodo.index)}/>
-                <h4>{date}일</h4>
-                  {userTodo.todo} - {userTodo.done ? "완료" : "미완료"} - 
-                  <button onClick={()=>remove(userTodo.index)}>삭제</button>
-                </label>
-              </div>
             ))}
-
-        </section>
-      </div>
-
+          </tbody>
+        </table>
+        <h2>현재 : {selectedDateKey}</h2>
+        <input 
+          type="text" 
+          value={userInput}
+          onChange={(e)=>setUserInput(e.target.value)}
+          onKeyDown={(e)=>{
+            if (e.key === "Enter") {
+              addTodo();
+            }
+          }}
+        />
+        <button onClick={addTodo}>일정 추가</button>
+      </section>
+      <section title="right">
+            {todoList.length == 0 ?
+            (<h3>일정이 비어있어요</h3>) :  (
+            Object.entries(groupedTodo).map(([date, todos])=>(
+              <div key={date}>
+                <h4>{date}</h4>
+                {todos.map((todo)=>(
+                  <label key={todo.index}>
+                    <input type="checkbox" onChange={()=>toggle(todo.index)}/>
+                    {todo.done? <del>{todo.text}</del> : todo.text} - 
+                    <button onClick={()=>remove(todo.index)}>❌</button>
+                  </label>
+                ))}
+              </div>
+            ))
+          )
+          }
+      </section>
     </div>
   );
 }
