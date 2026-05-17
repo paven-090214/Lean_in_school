@@ -1,3 +1,4 @@
+# 아두이노 스케치
 #include <Adafruit_LiquidCrystal.h>
 
 Adafruit_LiquidCrystal lcd(0);
