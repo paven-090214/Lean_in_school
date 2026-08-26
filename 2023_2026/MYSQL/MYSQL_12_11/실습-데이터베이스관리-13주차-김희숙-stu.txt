@@ -1,0 +1,1041 @@
+-- 데이터베이스관리(담당: 김희숙) 13주차 실습(stu)
+
+==============================
+----------------------------------------
+-- SAFE_UPDATE 모드 해제
+SET SQL_SAFE_UPDATES = 0;
+
+-- 테이블 구조 확인
+DESC 테이블명;
+-----------------------------------------
+/*------- 제약조건 확인(MySQL) ------ */
+-- (MySQL) 제약조건 확인
+
+-- 제약조건(부서, 사원)
+SELECT * 
+FROM  information_schema.table_constraints
+WHERE table_name IN ('부서','사원');
+/* -------------------------------------- */
+==============================
+13주차 (실습)
+==============================
+# (MySQL)
+1단계: 데이터베이스 생성  studydb
+    사용할 데이터베이스 선택
+USE studydb;
+
+2단계: 테이블 생성           (department, employee)
+                                    
+                                    [자유과제] 
+
+3단계: 데이터 입력
+
+4단계: 데이터 조회
+select * from 성적;
+-----------------------------------------
+# [요약] 서브쿼리(sub query), 부속질의, 부질의
+
+하위질의: 서브 쿼리 (sub query, 하위질의, 부질의, 중첩질의, 상관중첩질의)
+
+ANY : 서브쿼리의 여러 개의 결과 중 한 가지만 만족해도 되며
+ALL : 서브쿼리의 여러 개의 결과를 모두 만족시켜야 된다
+SOME : ANY 와 동일한 의미
+=ANY : IN 과 동일한 의미
+
+ALL:     하위질의의 모든 결과에 대해 조건 수식이 참인 경우 결과를 반환
+SOME: 하위질의의 한 개 이상의 결과에 대해 조건 수식이 참인 경우 결과를 반환
+ANY:   SOME 과 동일
+
+IN 은  =ANY 와 동일, NOT IN 은 <>ALL 과 동일하다
+-----------------------------------------
+
+-----------------------------------------
+/* ======================================== */
+--  [Quiz] 조인/서브질의 실습용(join)
+/* ======================================== */
+/*  [Quiz] 조인 실습용: join */
+
+-- (quiz-booksr_deptemp-mysql.sql) 
+
+-- department(deptno, deptname, floor)                    
+-- employee(empno, empname, title, manager, salary, dno)
+
+drop table if exists employee;
+drop table if exists department;
+
+CREATE TABLE department (
+     deptno              int          NOT NULL ,
+     deptname          varchar(10) ,
+     floor                 int ,
+     PRIMARY KEY(deptno)
+);
+
+INSERT INTO department VALUES(1, '영업', 8);
+INSERT INTO department VALUES(2, '기획', 10);
+INSERT INTO department VALUES(3, '개발', 9);
+INSERT INTO department VALUES(4, '총무', 7);
+
+CREATE TABLE employee (
+    empno	         int	              NOT NULL,
+    empname     varchar(10)     UNIQUE,
+    title	         varchar(10)     DEFAULT '사원',
+    manager       int  ,
+    salary            int	 ,
+    dno              int	 ,
+    PRIMARY KEY(empno),
+    FOREIGN KEY(dno) REFERENCES department(deptno)
+);
+
+INSERT INTO employee VALUES(2106, '김창섭','대리',1003, 2500000, 2);
+INSERT INTO employee VALUES(3426, '박영권','과장',4377, 3000000, 1);
+INSERT INTO employee VALUES(3011, '이수민','부장',4377, 4000000, 3);
+INSERT INTO employee VALUES(1003, '조민희','과장',4377, 3000000, 2);
+INSERT INTO employee VALUES(3427, '최종철','사원',3011, 1500000, 3);
+INSERT INTO employee VALUES(1365, '김상원','사원',3426, 1500000, 1);
+INSERT INTO employee(empno, empname, title, salary, dno) VALUES(4377, '이성래','이사', 5000000, 2);
+
+select * from department;
+select * from employee;
+/* ======================================== */
+/* ======================================== */
+--  [Quiz] 서브질의 실습용(sub query)
+/* ======================================== */
+DROP TABLE if exists pro;
+DROP TABLE if exists stu;
+
+-- stu(sno, sname, dept, sage)
+-- pro(pno, pname, dept, page)
+
+CREATE TABLE pro (
+    pno   char(2),
+    pname varchar(20), 
+    dept  varchar(20),
+    page  int,
+    primary key(pno)
+);
+
+CREATE TABLE stu (
+    sno   char(2),
+    sname varchar(20), 
+    dept  varchar(20),
+    sage  int,
+    primary key(sno)
+);
+
+insert into pro values('p1','이정무','컴퓨터',36);
+insert into pro values('p2','우태하','컴퓨터',32);
+insert into pro values('p3','이성민','건축',45);
+
+insert into stu values('s1','유준호','컴퓨터',23);
+insert into stu values('s2','오정민','컴퓨터',34);
+insert into stu values('s3','이태현','건축',22);
+insert into stu values('s4','신현주','건축',21);
+
+select * from pro;
+select * from stu;
+/* ======================================== */
+(중첩질의) 
+
+-- 하위질의(sub query)
+
+-- department(deptno, deptname, floor)
+-- employee(empno, empname, title, manager, salary, dno)
+
+select * from department;
+select * from employee;
+
+-- 20) 박영권과 같은 직급을 갖는 모든 사원들의 이름과 직급을 검색하라
+
+-- 21) 영업부나 개발부에 근무하는 사원들의 이름을 검색하라(IN 사용)
+
+-- 22) 영업부나 개발부에 근무하는 사원들의 이름을 검색하라(EXISTS 사용)
+ 
+-- [추가문제]
+-- 영업부나 개발부에 근무하지 않는 사원들의 이름을 검색하라(NOT IN 사용)
+
+-- 24) 사원들이 한 명도 소속되지 않은 부서명을 검색하라 (NOT EXISTS 사용)
+select  deptname
+from   department D
+where  NOT EXISTS (select *
+                    from   employee E
+                    where  D.deptno = E.dno);
+
+-- 상관중첩질의
+-- 25) 자신이 속한 부서의 사원들의 평균급여보다 많은 급여를 받는 사원들에 대해서 
+-- 이름, 부서번호, 급여를 검색하라 (상관중첩질의)
+select empname, dno, salary
+from employee E
+where salary > (select AVG(salary)
+               from   employee 
+               where  E.dno = employee.dno);
+
+----------------------------
+중첩질의 (stu, prof) (quiz6-lectDB-SELECT-subquery)
+
+-- stu(sno, sname, dept, sage)
+-- pro(pno, pname, dept, page)
+
+
+-- 3-1) 교수 테이블에서 이정무 의 학과와 같은 학생 이름, 학과, 나이를 검색하라
+-- 3-2) 교수 테이블에서 pno 가 p1 이거나 p2 인 학과와 같은 학생 이름, 학과, 나이를 검색하라
+
+-- 3-3) 학생 테이블과 교수 테이블에서 모든 학생들보다 나이가 많은 교수의
+-- 교번, 이름, 나이를 ALL 구문을 이용하여 검색하라
+-- 3-4) 학생 테이블과 교수 테이블에서 한 명 이상 교수보다 
+-- 나이가 많은 학생이 있을 경우 학생의 학번, 이름, 나이를 SOME 구문으로 검색하라
+
+-- 3-5) 가장 나이가 많은 학생의 이름, 나이를 검색하라
+-- 3-6) 각 학과마다 가장 나이가 많은 학생의 이름, 학과, 나이를 검색하라
+------------------------------------------------
+-- (답안)
+-- 3-1) 교수 테이블에서 이정무 의 학과 와 같은 학생이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  dept = (select dept
+               from   prof
+               where  pname = '이정무');
+
+-- 3-2) 교수 테이블에서 pno 가 p1 이거나 p2 인 학과 와 같은 학생이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  dept IN (select dept
+                from   prof
+                where  pno IN ('p1', 'p2'));
+
+-- 3-3) 학생 테이블과 교수 테이블에서 모든 학생들보다 나이가 많은 교수의
+-- 교번, 이름, 나이를 ALL 구문을 이용하여 검색하라
+select pno, pname,page
+from   prof
+where  page >ALL (select sage
+                   from   stu);
+
+-- 3-4) 학생 테이블과 교수 테이블에서 한 명 이상 교수보다 
+-- 나이가 많은 학생이 있을 경우 학생의 학번, 이름, 나이를 SOME 구문으로 검색하라
+select sno, sname, sage
+from   stu
+where  sage >SOME (select page
+                     from   prof);
+
+-- 3-5) 가장 나이가 많은 학생 이름, 나이를 검색하라
+select sname, dept, sage
+from   stu
+where  sage = (select MAX(sage)
+               from   stu);
+
+
+--3-6) 각 학과마다 가장 나이가 많은 학생 이름, 학과, 나이를 검색하라
+select sname, dept, sage
+from   stu S1
+where  sage IN (select MAX(sage)
+                from   stu S2
+                where  S1.dept = S2.dept);
+
+----------------------------------------------
+
+
+
+
+-----------------------------------------
+[Quiz] 조인
+-------------------------------------------------------------------
+-- (복습)
+[Quiz] 
+-- department(deptno, deptname, floor)                    
+-- employee(empno, empname, title, manager, salary, dno)
+
+-- 19) 사원에 대해서 부서이름, 사원이름, 직급, 급여를 검색하라.
+-- 부서이름에 대해서 오름차순, 부서이름이 같을 경우에는 salary에 대해서 내림차순으로 정렬하라
+
+-------------------------------------------------------------------
+[과제3] [실습2-3]
+
+-- [Quiz 1-01] 외부조인
+omember                   group_ex
+   id    groupid                groupid   position
+---------------------        ------------------------
+   100    A                         A           서울
+   101    B                         B            대구
+   102    A                         C            광주
+   102    F                          D           부산
+                                       E            대전
+/*--------------------------------------------------------*/
+drop table if exists omember;
+drop table if exists group_ex;
+
+CREATE TABLE omember ( 
+   id        CHAR(3)     NOT NULL ,
+   groupid CHAR(1)
+);
+
+CREATE TABLE group_ex ( 
+   groupid   CHAR(1)   NOT NULL ,
+   position   VARCHAR(12)
+);
+
+INSERT INTO omember VALUES('100', 'A');
+INSERT INTO omember VALUES('101', 'B');
+INSERT INTO omember VALUES('102', 'A');
+INSERT INTO omember VALUES('102', 'F');
+
+INSERT INTO group_ex VALUES('A', '서울');
+INSERT INTO group_ex VALUES('B', '대구');
+INSERT INTO group_ex VALUES('C', '광주');
+INSERT INTO group_ex VALUES('D', '부산');
+INSERT INTO group_ex VALUES('E', '대전');
+
+SELECT * FROM omember;
+SELECT * FROM group_ex;
+/*--------------------------------------------------------*/
+
+-- [Quiz 1-02] 외부조인
+다음을 관계대수로 나타내고 SQL과 실행결과를 작성하라
+
+emp                         project  
+   ename  pno                 pno      pname
+   -------------                 -----------------
+   홍길동  101                  101     작전중
+   임꺽정  102                  102     특공대
+   박찬호  101                  103     유레카
+   박찬호  103                  104     다모여
+   신동엽  NULL
+
+-- 2-1) 사원 테이블과 프로젝트 테이블에 대해 왼쪽외부조인 질의를 수행하라
+-- 2-2) 사원 테이블과 프로젝트 테이블에 대해 오른쪽외부조인 질의를 수행하라
+-- 2-3) 사원 테이블과 프로젝트 테이블에 대해 완전외부조인 질의를 수행하라
+--------------------------------------------------
+-- 다음 실행결과를 노트에 작성하라
+
+1) 내부조인(동등조인: equi join)
+2) 내부조인(자연조인: Natural join)
+
+3) 왼쪽외부조인
+4) 오른쪽외부조인
+5) 완전외부조인
+--------------------------------------------------
+-- 2-1) 왼쪽외부조인
+select  *
+from   emp LEFT OUTER JOIN project
+on      emp.pno = project.pno;
+
+-- 2-2) 오른쪽외부조인
+select  *
+from   emp RIGHT OUTER JOIN project
+on      emp.pno = project.pno;
+
+-- 2-3) 완전외부조인
+select  *
+from   emp FULL OUTER JOIN project
+on      emp.pno = project.pno;
+
+--------------------------------------------------
+/*--------------------------------------------------------*/
+/* 외부조인 실습용 (outerjoin02-mysql.sql) */
+
+drop table if exists emp;
+drop table if exists project;
+
+CREATE TABLE emp ( 
+    ename    VARCHAR(12)  NOT NULL ,
+    pno       int
+);
+
+CREATE TABLE project ( 
+   pno        int                  NOT NULL ,
+   pname    VARCHAR(20)
+);
+
+INSERT INTO emp VALUES('홍길동', 101);
+INSERT INTO emp VALUES('임꺽정', 102);
+INSERT INTO emp VALUES('박찬호', 101);
+INSERT INTO emp VALUES('박찬호', 103);
+INSERT INTO emp VALUES('신동엽', NULL);
+
+INSERT INTO project VALUES(101, '작전중');
+INSERT INTO project VALUES(102, '특공대');
+INSERT INTO project VALUES(103, '유레카');
+INSERT INTO project VALUES(104, '다모여');
+
+SELECT * FROM emp;
+SELECT * FROM project;
+/*--------------------------------------------------------*/
+==============================
+-- (요약) 자체 릴레이션: 자신의 테이블을 참조하는 관계(self join)
+==============================
+-- [실습] 사원명과 직속상사명을 검색하라
+-- emp(empno, empname, manager, dno)
+
+select  E.empname "사원명", M.empname "직속상사명"
+from   emp E, emp M
+where  E.manager = M.empno;
+
+/*------------------------------------------------------*/
+DROP TABLE if exists emp;
+
+create table emp (
+    empno       char(4) PRIMARY KEY ,
+    empname   varchar(12) ,
+    manager    char(4) ,
+    dno          char(1) ,
+    FOREIGN KEY (manager) REFERENCES emp(empno)
+);
+
+insert into emp values('3011','이수민',NULL,'1');
+insert into emp values('3426','박영권','3011','3');
+insert into emp values('1003','조민희','3011','1');
+insert into emp values('2106','김창섭','3426','2');
+insert into emp values('3427','최종철','2106','3');
+
+select * from emp;
+/*------------------------------------------------------*/
+
+/* --------------------------------------------- */
+[실습 3] (테이블 3걔)
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+
+-- (ans)
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+-- 3-1) 수강한 학생의 학생명, 과목명, 성적을 검색하라(내부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호;
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+
+-- 3-2) 이홍근의 학생명, 과목명, 성적을 검색하라
+SELECT  학생명,  과목명,  성적
+FROM    학생, 수강, 과목
+WHERE  학생.학번 = 수강.학번
+  AND    수강.과목번호 = 과목.과목번호
+  AND    학생명 = '이홍근';
+
+SELECT  학생명,  과목명,  성적
+FROM    학생 INNER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             INNER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호
+    WHERE 학생명 = '이홍근';
+
+-- 3-3) 전체 학생의 학생명, 과목명, 성적을 검색하라(외부조인)
+SELECT  학생명,  과목명,  성적
+FROM    학생 LEFT OUTER JOIN 수강
+   ON     학생.학번 = 수강.학번
+             LEFT OUTER JOIN 과목
+   ON    수강.과목번호 = 과목.과목번호;
+/*-----------------------------------------------*/
+-- (three-join-k-mysql.sql)
+
+-- 학생(학번, 학생명)
+-- 과목(과목번호, 과목명)
+-- 수강(학번, 과목번호, 성적)
+
+drop table if exists 수강;
+drop table if exists 학생;
+drop table if exists 과목;
+
+create table 학생 (
+   학번     char(5),
+   학생명  varchar(12),
+   primary key(학번)
+);
+
+create table 과목 (
+   과목번호  char(5),
+   과목명  varchar(30),
+   primary key(과목번호)
+);
+ 
+create table 수강 (
+   학번 char(5),
+   과목번호  char(5),
+   성적 int,
+   primary key(학번, 과목번호),
+   foreign key (학번) references 학생(학번),
+   foreign key (과목번호) references 과목(과목번호)
+);
+
+insert into 학생 values('11002','이홍근');
+insert into 학생 values('24036','김순미');
+insert into 학생 values('30419','박상웅');
+insert into 학생 values('30555','홍서범');
+insert into 학생 values('31890','유동희');
+insert into 학생 values('31892','이정무');
+insert into 학생 values('32000','김윤식');
+
+insert into 과목 values('CS310','데이터베이스');
+insert into 과목 values('CS313','운영체제');
+insert into 과목 values('CS345','자료구조');
+insert into 과목 values('CS326','자바');
+insert into 과목 values('CS546','DB프로그래밍');
+insert into 과목 values('CS378','멀티미디어');
+insert into 과목 values('CS388','웹프로그래밍');
+
+insert into 수강 values('11002','CS310',98);
+insert into 수강 values('11002','CS313',88);
+insert into 수강 values('24036','CS345',90);
+insert into 수강 values('30419','CS326',78);
+insert into 수강 values('31892','CS388',86);
+insert into 수강 values('32000','CS378',94);
+insert into 수강 values('31890','CS310',92);
+
+select * from 학생;
+select * from 과목;
+select * from 수강;
+/*-----------------------------------------------*/
+
+-----------------------------------------
+=========================
+(자유과제)
+/* ---------------------------------------------------- */
+-- [교재 7장]
+/* ---------------------------------------------------- */
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+/*------------------------------------------------------*/
+-- 3.2.10 부속 질의문을 이용한 검색
+
+-- 예제7-40 주문 테이블에서 달콤비스켓과 같은 제조업체에서 
+-- 제조한 제품의 제품명과 단가를 검색하라
+
+SELECT
+FROM
+WHERE             (SELECT
+                       FROM
+                       WHERE                  );
+
+
+-- 예제7-41 주문 테이블에서 적립금이 가장 많은 고객의
+-- 고객이름과 적립금을 검색하라
+
+
+-- 예제7-42 주문 테이블에서 banana 고객이 주문한 제품의
+-- 제품명과 제조업체를 검색하라(IN 사용)
+
+
+-- 예제7-43 주문 테이블에서 banana 고객이 주문하지 않은 제품의
+-- 제품명과 제조업체를 검색하라
+
+
+-- 예제7-44 주문 테이블에서 대한식품이 제조한 모든 제품의 단가보다 비싼
+-- 제품의 제품명, 단가, 제조업체를 검색하라
+
+
+
+-- 예제7-45 주문 테이블에서 2013년 3월 15일에 제품을 주문한 고객의 고객이름을 검색하라
+-- 1) (조인)
+
+-- 2) (EXISTS 사용)
+
+
+-- 예제7-46 주문 테이블에서 2013년 3월 15일에 제품을 주문하지 않은 고객의 고객이름을 검색하라
+-- (NOT EXISTS)
+
+/* ---------------------------------------------- */
+-- "데이터베이스개론", 김연희, 한빛, ch07
+-- (MySQL)
+-- handb 데이터베이스 존재할 경우, 데이터베이스 삭제
+drop database if exists handb;
+
+-- 교재 7장 스키마 생성
+CREATE DATABASE `handb` 
+  default character set utf8mb4;
+
+-- 사용할 데이터베이스 선택
+use handb;
+
+DROP TABLE if exists 주문;
+DROP TABLE if exists 고객;
+DROP TABLE if exists 제품;
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+CREATE TABLE 고객 (
+	고객아이디  VARCHAR(20)	NOT NULL,
+	고객이름    VARCHAR(10),
+	나이         INT,
+	등급         VARCHAR(10)	NOT NULL,
+	직업         VARCHAR(20),
+	적립금      INT	            DEFAULT 0,
+	PRIMARY KEY(고객아이디)
+);
+
+CREATE TABLE 제품 (
+	제품번호    CHAR(3)	NOT NULL,
+	제품명       VARCHAR(20),
+	재고량       INT,
+	단가         INT,
+	제조업체    VARCHAR(20),
+	PRIMARY KEY(제품번호)
+	-- CHECK (재고량 >= 0 AND 재고량 <= 10000)
+);
+
+CREATE TABLE 주문 (
+	주문번호    CHAR(3)	NOT NULL,
+	주문고객    VARCHAR(20),
+	주문제품    CHAR(3),
+	수량         INT,
+	배송지      VARCHAR(30),
+	주문일자    DATE,
+	PRIMARY KEY(주문번호),
+	FOREIGN KEY(주문고객) REFERENCES 고객(고객아이디),
+	FOREIGN KEY(주문제품) REFERENCES 제품(제품번호)
+);
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+INSERT INTO 고객 VALUES ('apple', '정소화', 20, 'gold', '학생', 1000);
+INSERT INTO 고객 VALUES ('banana', '김선우', 25, 'vip', '간호사', 2500);
+INSERT INTO 고객 VALUES ('carrot', '고명석', 28, 'gold', '교사', 4500);
+INSERT INTO 고객 VALUES ('orange', '김용욱', 22, 'silver', '학생', 0);
+INSERT INTO 고객 VALUES ('melon', '성원용', 35, 'gold', '회사원', 5000);
+INSERT INTO 고객 VALUES ('pear', '채광주', 31, 'silver', '회사원', 500);
+INSERT INTO 고객 VALUES ('peach', '오형준', NULL, 'silver', '의사', 300);
+
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+INSERT INTO 제품 VALUES ('p01', '그냥만두', 5000, 4500, '대한식품');
+INSERT INTO 제품 VALUES ('p02', '매운쫄면', 2500, 5500, '민국푸드');
+INSERT INTO 제품 VALUES ('p03', '쿵떡파이', 3600, 2600, '한빛제과');
+INSERT INTO 제품 VALUES ('p04', '맛난초콜렛', 1250, 2500, '한빛제과');
+INSERT INTO 제품 VALUES ('p05', '얼큰라면', 2200, 1200, '대한식품');
+INSERT INTO 제품 VALUES ('p06', '통통우동', 1000, 1550, '민국푸드');
+INSERT INTO 제품 VALUES ('p07', '달콤비스켓', 1650, 1500, '한빛제과');
+
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+INSERT INTO 주문 VALUES ('o01', 'apple', 'p03', 10, '서울시 마포구', '13/01/01');
+INSERT INTO 주문 VALUES ('o02', 'melon', 'p01', 5, '인천시 계양구', '13/01/10');
+INSERT INTO 주문 VALUES ('o03', 'banana', 'p06', 45, '경기도 부천시', '13/01/11');
+INSERT INTO 주문 VALUES ('o04', 'carrot', 'p02', 8, '부산시 금정구', '13/02/01');
+INSERT INTO 주문 VALUES ('o05', 'melon', 'p06', 36, '경기도 용인시', '13/02/20');
+INSERT INTO 주문 VALUES ('o06', 'banana', 'p01', 19, '충청북도 보은군', '13/03/02');
+INSERT INTO 주문 VALUES ('o07', 'apple', 'p03', 22, '서울시 영등포구', '13/03/15');
+INSERT INTO 주문 VALUES ('o08', 'pear', 'p02', 50, '강원도 춘천시', '13/04/10');
+INSERT INTO 주문 VALUES ('o09', 'banana', 'p04', 15, '전라남도 목포시', '13/04/11');
+INSERT INTO 주문 VALUES ('o10', 'carrot', 'p03', 20, '경기도 안양시', '13/05/22');
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+select * from 고객;
+select * from 제품;
+select * from 주문;
+
+/* --------------------------------------------- */
+=========================
+-- (ans)
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 3.2.9 여러 테이블에 대한 조인 검색
+
+-- 예제7-36 판매 데이터베이스에서 banana 고객이 주문한 제품의 이름을 검색해보자
+-- 방법1)
+SELECT  주문고객, 제품명
+FROM    주문, 제품
+WHERE   주문고객 = 'banana'
+ AND    주문.주문제품 = 제품.제품번호;
+
+--방법2)
+SELECT  주문고객, 제품명
+FROM    주문 INNER JOIN 제품
+ON      주문고객 = 'banana'
+ WHERE  주문.주문제품 = 제품.제품번호;
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 예제7-38 주문 테이블에서 나이가 30세 이상의 고객이 주문한 제품의
+-- 주문제품과 주문일자를 검색하라
+-- 방법1)
+SELECT  주문제품, 주문일자
+FROM    고객, 주문
+WHERE   나이 >= 30
+  AND   고객.고객아이디 = 주문.주문고객;
+
+-- 예제7-39 주문 테이블에서 고명석 고객이 주문한 제품의 제품명을 검색하라
+-- 방법1)
+SELECT  고객이름, 제품명
+FROM    고객, 주문, 제품
+WHERE   고객이름 = '고명석'
+  AND   고객.고객아이디 = 주문.주문고객
+  AND   주문.주문제품 = 제품.제품번호;
+
+/*------------------------------------------------------*/
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 3.2.10 부속 질의문을 이용한 검색
+
+-- 예제7-40 주문 테이블에서 달콤비스켓과 같은 제조업체에서 
+-- 제조한 제품의 제품명과 단가를 검색하라
+SELECT  제품명, 단가
+FROM    제품
+WHERE   제조업체 = (SELECT   제조업체
+                   FROM     제품
+                   WHERE    제품명 = '달콤비스켓');
+
+-- 예제7-41 주문 테이블에서 적립금이 가장 많은 고객의
+-- 고객이름과 적립금을 검색하라
+SELECT 고객이름, 적립금
+FROM   고객
+WHERE  적립금    = (SELECT  MAX(적립금)
+                   FROM    고객 );
+
+
+--예제7-42 주문 테이블에서 banana 고객이 주문한 제품의
+--제품명과 제조업체를 검색하라(IN 사용)
+SELECT  제품명, 제조업체
+FROM    제품
+WHERE   제품번호 IN (SELECT   주문제품
+                    FROM     주문
+                    WHERE    주문고객 = 'banana' );
+
+
+-- 예제7-43 주문 테이블에서 banana 고객이 주문하지 않은 제품의
+-- 제품명과 제조업체를 검색하라
+SELECT  제품명, 제조업체
+FROM    제품
+WHERE   제품번호 NOT IN (SELECT   주문제품
+                        FROM     주문
+                        WHERE    주문고객 = 'banana' );
+
+
+-- 예제7-44 주문 테이블에서 대한식품이 제조한 모든 제품의 단가보다 비싼
+-- 제품의 제품명, 단가, 제조업체를 검색하라
+SELECT   제품명, 단가, 제조업체
+FROM     제품
+WHERE    단가  >ALL  (SELECT   단가
+                     FROM     제품 
+                     WHERE    제조업체 = '대한식품' );
+
+
+-- 예제7-45 주문 테이블에서 2013년 3월 15일에 제품을 주문한 고객의 
+-- 고객이름을 검색하라
+SELECT  고객이름
+FROM    고객
+WHERE   EXISTS    (SELECT  *
+                   FROM     주문
+                   WHERE    주문일자 = '13/03/15' 
+                     AND    주문.주문고객 = 고객.고객아이디);
+
+
+-- 예제7-46 주문 테이블에서 2013년 3월 15일에 제품을 주문하지 않은 
+-- 고객의 고객이름을 검색하라
+
+SELECT  고객이름
+FROM    고객
+WHERE   NOT EXISTS   (SELECT  *
+                      FROM     주문
+                      WHERE    주문일자 = '13/03/15' 
+                        AND    주문.주문고객 = 고객.고객아이디);
+
+
+=========================
+==============================
+-- [Quiz 1-02] 추가예제(fruit)
+==============================
+-- [Quiz1-02] fruit
+
+-- 4-1) 원산지를 알 수 없는 과일의 과일이름, 원산지를 검색하라
+
+-- 4-2) 과일 가격의 내림차순으로 정렬하는데,
+-- 가격이 같은 경우, 원산지의 오름차순 정렬로 검색하라
+
+-- 4-3) 원산지가 국으로 끝나는 과일이름, 원산지를 검색하라
+-- 4-4) 원산지가 인으로 시작하는 과일이름, 원산지를 출력하라
+
+-- 4-5) 원산지별로 원산지와 개수를 검색하라
+-- 4-6) 색상별로 색상이 3개 이상인 과일만 색상, 과일개수를 검색하라
+-- 단, 과일개수가 많은 것부터 나타나도록 검색하라
+
+-- 5-1) UPDATE 문을 이용하여 빨간색 과일 가격을 10% 인상하라
+-- 5-2) DELETE 문을 이용하여 원산지가 호주인 과일의 목록을 삭제하라
+
+/*--------------fruit 스키마 (자동생성 있는 경우)--------*/
+-- (MySQL)
+
+drop table if exists fruit;
+
+create table fruit (
+    과일번호     int      NOT NULL AUTO_INCREMENT  ,
+    과일이름     varchar(30) ,
+    가격           int,
+    색상           varchar(20) ,
+    원산지        varchar(30) , 
+    PRIMARY KEY(과일번호)
+);
+
+insert into fruit(과일이름,가격,색상,원산지) values('사과',2000,'빨간색','한국');
+insert into fruit(과일이름,가격,색상,원산지) values('배',5000,'노란색','한국');
+insert into fruit(과일이름,가격,색상,원산지) values('바나나',1500,'노란색','인도네시아');
+insert into fruit(과일이름,가격,색상,원산지) values('키위',4000,'초록색','호주');
+insert into fruit(과일이름,가격,색상,원산지) values('수박',8000,'초록색','한국');
+
+insert into fruit(과일이름,가격,색상,원산지) values('오렌지',1000,'주황색','한국');
+insert into fruit(과일이름,가격,색상,원산지) values('망고',5000,'노랑색','페루');
+insert into fruit(과일이름,가격,색상,원산지) values('체리',4800,'빨간색','중국');
+insert into fruit(과일이름,가격,색상,원산지) values('포도',2500,'보라색','한국');
+insert into fruit(과일이름,가격,색상,원산지) values('아보카도',2000,'초록색','남아프리카');
+insert into fruit(과일이름,가격,색상,원산지) values('레몬',6000,'노란색','미국');
+
+-- NULL 값 입력
+insert into fruit(과일이름,가격,색상,원산지) values('모과',5000,'노란색', NULL);
+
+select * from fruit;
+/*------------------------------------------------------*/
+
+===================================
+----------------------------------------------
+-- department(dept_id, dept_name, office)
+-- student(stu_id, resident_id, name, year, address, dept_id)
+-- professor(prof_id, resident_id, name, dept_id, position, year_emp)
+-- course(course_id, title, credit)
+-- class(class_id, course_id, year, semester, division, prof_id, classroom, enroll)
+-- takes(stu_id, class_id, grade)
+
+----------------------------------------------
+select * from department;
+select * from student;
+select * from professor;
+select * from course;
+select * from class;
+select * from takes;
+---------------------------------------------
+/*------------------------------------------------------------------------------------*/
+/* ehan p135   (ehan_stu_mysql.sql)                 */
+/*--------------------------------------------------*/
+/*                                                  */            
+
+DROP TABLE takes; 
+DROP TABLE class; 
+DROP TABLE professor; 
+DROP TABLE course; 
+DROP TABLE student;
+DROP TABLE department;
+ 
+
+CREATE TABLE department ( 
+	dept_id              varchar(10)  NOT NULL ,
+	dept_name            varchar(24)  NOT NULL ,
+	office               varchar(10) ,
+        CONSTRAINT pk_department PRIMARY KEY(dept_id)
+);
+insert into department values('920','컴퓨터공학과','201호');
+insert into department values('923','산업공학과','207호');
+insert into department values('925','전자공학과','308호');
+
+
+CREATE TABLE student( 
+	stu_id               varchar(10)  NOT NULL ,
+	resident_id          varchar(14)  NOT NULL ,
+	name                 varchar(20)  NOT NULL ,
+	year                 int  ,
+	address              varchar(10) ,
+	dept_id              varchar(10)  NOT NULL ,
+        CONSTRAINT pk_student PRIMARY KEY(stu_id) ,
+        CONSTRAINT fk_student FOREIGN KEY (dept_id) 
+                     REFERENCES department(dept_id)
+);
+
+insert into student values('1292001','900424-1825409','김광식',3,'서울','920');
+insert into student values('1292002','900305-1730021','김정현',3,'서울','920');
+insert into student values('1292003','891021-2308302','김현정',4,'대전','920');
+insert into student values('1292301','890902-2704012','김현정',2,'대구','923');
+insert into student values('1292303','910715-1524390','박광수',3,'광주','923');
+insert into student values('1292305','921011-1809003','김우주',4,'부산','923');
+insert into student values('1292501','900825-1506390','박철수',3,'대전','925');
+insert into student values('1292502','911011-1809003','백태성',3,'서울','925');
+
+CREATE TABLE professor( 
+	prof_id              varchar(10)  NOT NULL ,
+	resident_id          varchar(14)  NOT NULL ,
+	name                 varchar(20)  NOT NULL ,
+	dept_id              varchar(10)  NOT NULL ,
+	position             varchar(10)   ,
+	year_emp             int   ,
+        CONSTRAINT pk_professor PRIMARY KEY(prof_id) ,
+        CONSTRAINT fk_professor FOREIGN KEY (dept_id) 
+                        REFERENCES department(dept_id)
+);
+
+insert into professor values('92001','590327-1839240','이태규','920','교수',1997);
+insert into professor values('92002','690702-1350026','고희석','920','부교수',2003);
+insert into professor values('92301','741011-2765501','최성희','923','부교수',2005);
+insert into professor values('92302','750728-1102458','김태석','923','교수',1999);
+insert into professor values('92501','620505-1400546','박철재','925','조교수',2007);
+insert into professor values('92502','740101-1830264','장민석','925','부교수',2005);
+
+CREATE TABLE course( 
+	course_id            varchar(10)  NOT NULL ,
+	title                varchar(24)  NOT NULL ,
+	credit               int  ,
+        CONSTRAINT pk_course PRIMARY KEY(course_id)
+);
+
+insert into course values('C101','전산개론',3);
+insert into course values('C102','자료구조',3);
+insert into course values('C103','데이터베이스',4);
+insert into course values('C301','운영체제',3);
+insert into course values('C302','컴퓨터구조',3);
+insert into course values('C303','이산수학',4);
+insert into course values('C304','객체지향언어',4);
+insert into course values('C501','인공지능',3);
+insert into course values('C502','알고리즘',2);
+
+CREATE TABLE class( 
+	class_id             varchar(10)  NOT NULL ,
+	course_id            varchar(10)  NOT NULL ,
+	year                 int  ,
+	semester             int  ,
+	division             CHAR(1) ,
+	prof_id              varchar(10)  NOT NULL ,
+	classroom            varchar(9)  ,
+	enroll               int  ,
+        CONSTRAINT pk_class PRIMARY KEY(class_id) ,
+        CONSTRAINT fk_class1 FOREIGN KEY (course_id) 
+                        REFERENCES course(course_id),
+        CONSTRAINT fk_class2 FOREIGN KEY (prof_id) 
+                        REFERENCES professor(prof_id)
+);
+
+insert into class values('C101-01','C101',2012,1,'A','92301','301호',40);
+insert into class values('C102-01','C102',2012,1,'A','92001','209호',30);
+insert into class values('C103-01','C103',2012,1,'A','92501','208호',30);
+insert into class values('C103-02','C103',2012,1,'B','92301','301호',30);
+insert into class values('C501-01','C501',2012,1,'A','92501','103호',45);
+insert into class values('C501-02','C501',2012,1,'B','92502','204호',25);
+insert into class values('C301-01','C301',2012,2,'A','92502','301호',30);
+insert into class values('C302-01','C302',2012,2,'A','92501','209호',45);
+insert into class values('C502-01','C502',2012,2,'A','92001','209호',30);
+insert into class values('C502-02','C502',2012,2,'B','92301','103호',26);
+
+CREATE TABLE takes( 
+	stu_id               varchar(10)  NOT NULL ,
+	class_id             varchar(10)  NOT NULL ,
+	grade                CHAR(5) ,
+        CONSTRAINT pk_takes PRIMARY KEY(stu_id, class_id),
+        CONSTRAINT fk_takes1 FOREIGN KEY (stu_id) 
+                        REFERENCES student(stu_id) ,
+        CONSTRAINT fk_takes2 FOREIGN KEY (class_id) 
+                        REFERENCES class(class_id)
+);
+
+insert into takes values('1292001','C101-01','B+');
+insert into takes values('1292001','C103-01','A+');
+insert into takes values('1292001','C301-01','A');
+insert into takes values('1292002','C102-01','A');
+insert into takes values('1292002','C103-01','B+');
+insert into takes values('1292002','C502-01','C+');
+insert into takes values('1292003','C103-02','B');
+insert into takes values('1292003','C501-02','A+');
+insert into takes values('1292301','C102-01','C+');
+insert into takes values('1292303','C102-01','C');
+insert into takes values('1292303','C103-02','B+');
+insert into takes values('1292303','C501-01','A+');
+
+COMMIT;
+
+select * from department;
+select * from student;
+select * from professor;
+select * from course;
+select * from class;
+select * from takes;
+
+/*------------------------------------------------------------------------------------*/
+
+[Quiz 2]  
+
+[예제1] 다음에 대하여 SQL문법과 실행결과를 작성하라
+
+질의21) student 테이블에서 주소를 검색하라
+질의22) student 테이블에서 주소를 검색하라(중복 제거)
+질의23) student 테이블에서 모든 필드를 검색하라
+질의24) professor 테이블에서 교수이름, 재직연수를 검색하라(현재연도 - 임용년도)
+질의27) student 테이블에서 1, 2학년 학생들의 이름과 학번을 검색하라
+단, 학생이름의 오름차순 정렬하고, 같은 이름은 학번의 오름차순 정렬하라
+질의28) student 테이블에서 1, 2학년 학생들의 이름과 학번을 검색하라
+단, 학생이름의 내림차순 정렬하고, 같은 이름은 학번의 오름차순 정렬하라
+질의33) 교수이름,직위, 재직연수를 검색하는데, 필드명 이름, 직위, 재직연수로 출력하라
+질의34) student 테이블에서 김씨 성을 가진 학생을 검색하라
+질의35) 여학생들만을 검색하라(주민등록번호 뒷자리가 2로 시작하는 학생)
+
+
+[예제2] 조인, 집합연산
+
+질의20) 학생이름, 학과명을 검색하라
+ 방법1) SELECT … FROM … WHERE            방법2) SELECT … FROM … ON
+
+질의25) 학생이름, 학번, 소속학과명을 검색하라
+질의26) 컴퓨터공학과 2학년 학생들의 학번을 검색하라
+질의30) student 테이블과 department 테이블을 조인하여 학생이름, 소속학과이름을 검색
+      단, student 테이블은 s로, department 테이블은 d 로 재명명하라
+질의31) student 테이블에서 김광식 학생과 주소가 같은 학생이름을 검색하라
+
+질의36) student 테이블의 학생이름과 professor 테이블의 교수이름을 합집합하라
+질의40) 컴퓨터공학과 학생들 중에서 교과목에 상관없이 학점을 A+ 받은 학생의 학번검색
+질의41) 산업공학과 학생들 중에서 한번도 A+ 를 받지 못한 학생들의 학번을 검색하라
+
+[예제3] 외부조인  질의42)~질의47)
+
+질의42) 모든 교과목들에 대해 교과목명, 학점수, 개설연도, 개설학기를 검색하라
+
+select  title,credit,year,semester
+from   course  left outer  join  class
+on     course.course_id = class.course_id;
+
+select  title,credit,year,semester
+from   course  full outer  join  class
+on     course.course_id = class.course_id;
+
+[예제4] 집계함수, group by
+
+질의48) student 테이블에서 2학년 학생이 몇 명인지 검색하라
+질의49) student 테이블에서 dept_id 필드에 값이 몇 개인지 검색하라
+질의49) student 테이블에서 dept_id 필드에 값이 몇 개인지 검색하라(중복 제거)
+질의50) 컴퓨터공학과의 학생 수를 검색하라
+질의51) 전체교수들의 재직연수 합을 구하라
+질의55) 전체 교수의 평균 재직연수를 출력하라
+
+질의57) student 테이블에서 학과번호(dept_id) 별로 레코드의 개수를 검색하라
+질의58) 학과명 별로 레코드의 개수를 검색하라
+질의60) 학과별 교수 숫자와 평균 재직연수, 최대 재직연수를 검색하라
+질의62) 평균 재직연수가 10년 이상인 학과에 대해서만 
+교수 수, 평균재직연수, 최대재직연수를 검색하라(having)
+질의63) 직원 숫자가 5명 이상인 부서에 대해서 
+부서별 직원수, 평균급여, 최대급여, 최소급여를 검색하라
+
+[예제5] 널 값(NULL)
+
+질의64) takes 테이블에서 아직 학점이 부여되지 않은 학생의 학번을 검색하라
+
+질의65) takes 테이블에서 학점이 A+ 가 아닌 학생들의 학번을 검색하라
+
+[예제6] 중첩질의(sub query)
+
+질의66) 301호 강의실에서 개설된 강좌의 과목명을 검색하라(하위질의)
+질의67) 301호 강의실에서 개설된 강좌의 과목명을 검색하라(조인)
+
+질의68) 2012년 2학기에 개설되지 않은 과목명을 검색하라(하위질의)(NOT  IN)
+
+질의70) 301호 강의실에서 개설된 강좌의 과목명을 검색하라
+질의71) 2012년 2학기에 개설되지 않은 과목명을 검색하라(NOT EXISTS)
+===================================

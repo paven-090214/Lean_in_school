@@ -1,0 +1,52 @@
+# MYSQL
+
+## NULL
+
+1. `NULL`값은 `0`과 `''`도 아닌 값
+2. `NULL`에 산술연산(+, -, *, /)처리 시 결과는 `NULL`이다.
+
+### NULL을 처리하는 함수 NVL(NULL VALUE)
+
+NVL의 규칙
+
+- 첫 번째 매개변수가 null이면 두 번재 값
+- 두 번째 매개변수가 null이면 첫 번재 값
+
+### QUREY
+
+```mysql
+SELECT 사원명, 기본급, 수당, 기본급 + 수당 AS 월급여
+FROM 급여
+WHERE 수당 IS NULL;
+```
+
+```mysql
+SELECT 사원명, 기본급, 수당, 기본급 + NVL(수당, 0) AS 월급여
+FROM 급여;
+```
+
+```mysql
+SELECT 사원명, 기본급, 수당, 기본급 + NVL(기본급 + 수당, 기본급) AS 월급여
+FROM 급여;
+```
+
+```text
+NVL(수당, 0) = 수당이 NULL이라면 0으로 계산
+NVL(기본급 + 수당, 기본급) = 기본급 + 수량이 NULL이라면 기본급으로 계산
+```
+
+### NULLIF()
+
+- 첫 번째, 두 번재 값인 매개변수가 같다면 null 
+
+### DECODE
+
+삼항연산자
+
+
+## 집계함수(aggregate  function)
+
+- COUNT(*) -> NULL을 포함함
+- COUNT(필드명) -> NULL을 제외함
+- SUM(필드명) -> NULL값을 자체적으로 제거함
+- AVG(필드명) -> NULL값을 자체적으로 제거함

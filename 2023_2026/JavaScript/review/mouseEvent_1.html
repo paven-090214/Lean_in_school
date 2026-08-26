@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Events and Style Change</title>
+    <style>
+        #changeColorDiv {
+            width: 100px;
+            height: 100px;
+            background-color: lightblue;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const changeColorDiv = document.getElementById('changeColorDiv');
+
+            changeColorDiv.addEventListener('mouseover', () => {
+                changeColorDiv.style.backgroundColor = 'lightgreen';
+            });
+
+            changeColorDiv.addEventListener('mouseout', () => {
+                changeColorDiv.style.backgroundColor = 'lightblue';
+            });
+
+            changeColorDiv.addEventListener('click', () => {
+                alert('색이 변경되었습니다!');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="changeColorDiv"></div>
+</body>
+
+</html>

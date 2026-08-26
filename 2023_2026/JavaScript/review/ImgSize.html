@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rects = document.querySelectorAll('.rect'); // 수정: 여러 개의 이미지가 아닌 하나의 이미지에 대한 참조를 가져옴
+            rects.forEach((rect, index)=>{
+                const width = (index + 1) * 100;
+          const height = (index + 1) * 100;
+          const src = `./img/a.gif`;
+          rect.setAttribute('src', src);
+          rect.setAttribute('width', width);
+          rect.setAttribute('height', height);
+            })
+
+        })
+    </script>
+</head>
+
+<body>
+    <img class="rect">
+    <img class="rect">
+</body>
+

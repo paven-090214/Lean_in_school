@@ -1,0 +1,17 @@
+.layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.left-panel,
+.right-panel {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 24px;
+
+  /* 15. CSS 마무리 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}

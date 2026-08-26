@@ -1,0 +1,40 @@
+마우스 이벤트:
+
+click: 마우스 클릭 시 발생
+dblclick: 마우스 더블 클릭 시 발생
+mousedown: 마우스 버튼이 눌렸을 때 발생
+mouseup: 마우스 버튼이 놓아졌을 때 발생
+mousemove: 마우스가 움직일 때 발생
+mouseover: 마우스가 요소 위로 올라갈 때 발생
+mouseout: 마우스가 요소에서 벗어날 때 발생
+키보드 이벤트:
+
+keydown: 키보드 키를 눌렀을 때 발생
+keyup: 키보드 키를 놓았을 때 발생
+keypress: 키를 눌렀을 때 발생 (Deprecated)
+폼 이벤트:
+
+submit: 폼이 제출될 때 발생
+change: 입력 값이 변경될 때 발생
+input: 입력 요소에 값이 입력될 때 발생
+focus: 요소가 포커스를 받을 때 발생
+blur: 요소가 포커스를 잃을 때 발생
+윈도우 이벤트:
+
+load: 웹 페이지 또는 리소스가 완전히 로드될 때 발생
+unload: 웹 페이지가 언로드될 때 발생
+resize: 윈도우 크기가 변경될 때 발생
+scroll: 페이지가 스크롤될 때 발생
+네트워크 이벤트:
+
+online: 온라인 상태로 전환될 때 발생
+offline: 오프라인 상태로 전환될 때 발생
+애니메이션 및 트랜지션 이벤트:
+
+animationstart, animationend, animationiteration: CSS 애니메이션 시작, 종료, 반복 중에 각각 발생
+transitionstart, transitionend: CSS 트랜지션 시작, 종료 중에 각각 발생
+기타 이벤트:
+
+contextmenu: 마우스 오른쪽 버튼으로 요소를 클릭할 때 발생
+error: 자바스크립트 에러가 발생했을 때 발생
+DOMContentLoaded: 초기 HTML 문서가 완전히 로드되고 파싱됐을 때 발생

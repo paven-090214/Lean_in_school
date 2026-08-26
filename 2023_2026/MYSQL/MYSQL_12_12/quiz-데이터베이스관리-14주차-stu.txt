@@ -1,0 +1,378 @@
+-- 데이터베이스관리(담당: 김희숙) 14주차 Quiz (stu)
+[Quiz] 14주차
+==============================
+----------------------------------------
+-- SAFE_UPDATE 모드 해제
+SET SQL_SAFE_UPDATES = 0;
+
+-- 테이블 구조 확인
+DESC 테이블명;
+-----------------------------------------
+/*------------------------------------------------------*/
+-- [Quiz 1-01] 조인
+다음 두 릴레이션 R과 S에 대해 R을 왼쪽, S를 오른쪽 릴레이션으로 하고
+속성 B를 조인 속성으로 하여
+자연조인, 왼쪽외부조인, 완전외부조인으로 수행하였을 때
+결과 릴레이션의 카디널리트는 각각 얼마인가?
+
+R                S
+  A       B        B       C
+-----------     -----------
+   a       2        1        x
+   b       3        2       y
+   c        3        3      z
+   d       5
+--------------------------------------------------
+-- [Quiz 1-01] 조인 실행결과
+
+-- 결과 릴레이션의 카디날리티는 각각 무엇인가
+1) 자연조인
+2) 왼쪽외부조인
+3) 완전외부조인
+/* -------------------------------------------------- */
+
+-- [Quiz 1-02] 집계함수, 그룹화, 하위질의 (문제)
+R                S
+  A       B        C       D
+-----------     -----------
+  a       2        a        1
+  b      4         b       2
+  c      2         c       4
+  c      4     
+  c      6
+
+다음 실행결과는 무엇인가?
+-- 1)
+SELECT    COUNT(*)
+FROM     R
+WHERE   B =SOME ( SELECT D
+                             FROM S
+                            );
+
+-- 2) 
+SELECT   D, AVG(B)
+FROM     R, S
+WHERE   A = C
+GROUP BY D
+HAVING  COUNT(*) > 1;
+
+
+/* ============================ */
+--  [Quiz] 집계함수/group by 실습용
+/* ============================ */
+/*  [Quiz] 집계함수/group by 실습용 */
+
+/*--------------사원 스키마 ---------------*/
+-- (MySQL)
+drop table if exists 사원;
+
+create table 사원 (
+    직원코드  varchar(8)      NOT NULL  ,
+    성명        varchar(20)    NOT NULL  ,
+    직책        varchar(10) ,
+    연봉        int            ,
+    성별        char(1) ,    
+    PRIMARY KEY(직원코드)
+);
+
+-- 사원(직원코드,성명,직책,연봉)
+insert into 사원 values('161353','김미나','대리',2300,'여');
+insert into 사원 values('181323','최영락','사원',1900,'남');
+insert into 사원 values('151453','홍진호','과장',2800,'남');
+insert into 사원 values('135485','구준표','과장',3000,'남');
+insert into 사원 values('104895','김나래','팀장',3600,'남');
+insert into 사원 values('165484','김하늘','대리',2400,'남');
+
+select * from 사원;
+/*------------------------------------------------------*/
+-- [Quiz 2-01] 집계함수/group by
+-- 1) 최대 연봉을 구하시오
+-- 2) 사원수를 구하시오
+-- 3) 직책의 개수를 중복없이 검색하시오(DISTINCT)
+
+-- 4) 직책별 연봉의 평균을 구하시오
+-- 5) 직책별 사원수를 구하시오
+-- 6) 연봉이 2500 이상인 사원이 2명 이상인 
+직책의 사원수를 구하시오
+--------------------------------------------------
+
+--------------------------------------------------
+-----------------------------------------
+# [요약] 뷰(view): 가상의 테이블
+
+장점) 1) 보안성
+        2) 사용의 편의성
+-----------------------------------------
+/* ============================ */
+--  [Quiz] 집계함수/뷰 실습용
+/* ============================ */
+/*  [Quiz] 집계함수/뷰 실습용 */
+
+/*  [실습] 뷰 실습용: view */
+
+/*--------------고객 스키마 ---------------*/
+-- (MySQL)
+DROP TABLE if exists 고객;
+
+-- 고객(고객아이디,고객이름,나이,등급,직업,적립금)
+CREATE TABLE 고객 (
+      고객아이디   VARCHAR(20)             NOT NULL,
+      고객이름      VARCHAR(10),
+      나이            INT,
+      등급            VARCHAR(10)              NOT NULL,
+      직업            VARCHAR(20),
+      적립금         INT                            DEFAULT 0,
+      PRIMARY KEY(고객아이디)
+);
+
+INSERT INTO 고객 VALUES ('apple', '정소화', 20, 'gold', '학생', 1000);
+INSERT INTO 고객 VALUES ('banana', '김선우', 25, 'vip', '간호사', 2500);
+INSERT INTO 고객 VALUES ('carrot', '고명석', 28, 'gold', '교사', 4500);
+INSERT INTO 고객 VALUES ('orange', '김용축', 22, 'silver', '학생', NULL);
+INSERT INTO 고객 VALUES ('melon', '성원용', 35, 'gold', '회사원', 5000);
+INSERT INTO 고객 VALUES ('peach', '오형준', NULL, 'silver', '의사', 300);
+INSERT INTO 고객 VALUES ('pear', '채광주', 31, 'silver', '회사원', 500);
+
+select * from 고객;
+/*-----------------------------------------------*/
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+
+-- 2) 뷰 작성: 고객_학생 뷰 생성
+-- 고객아이디, 등급, 직업,적립금 으로 이루어진다
+
+
+--------------------------------------------------
+/* ---------------------------------------------- */
+-- "데이터베이스개론", 김연희, 한빛, ch07
+-- (MySQL)
+-- handb 데이터베이스 존재할 경우, 데이터베이스 삭제
+drop database if exists handb;
+
+-- 교재 7장 스키마 생성
+CREATE DATABASE `handb` 
+  default character set utf8mb4;
+
+-- 사용할 데이터베이스 선택
+use handb;
+
+DROP TABLE if exists 주문;
+DROP TABLE if exists 고객;
+DROP TABLE if exists 제품;
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+CREATE TABLE 고객 (
+	고객아이디  VARCHAR(20)	NOT NULL,
+	고객이름    VARCHAR(10),
+	나이         INT,
+	등급         VARCHAR(10)	NOT NULL,
+	직업         VARCHAR(20),
+	적립금      INT	            DEFAULT 0,
+	PRIMARY KEY(고객아이디)
+);
+
+CREATE TABLE 제품 (
+	제품번호    CHAR(3)	NOT NULL,
+	제품명       VARCHAR(20),
+	재고량       INT,
+	단가         INT,
+	제조업체    VARCHAR(20),
+	PRIMARY KEY(제품번호)
+	-- CHECK (재고량 >= 0 AND 재고량 <= 10000)
+);
+
+CREATE TABLE 주문 (
+	주문번호    CHAR(3)	NOT NULL,
+	주문고객    VARCHAR(20),
+	주문제품    CHAR(3),
+	수량         INT,
+	배송지      VARCHAR(30),
+	주문일자    DATE,
+	PRIMARY KEY(주문번호),
+	FOREIGN KEY(주문고객) REFERENCES 고객(고객아이디),
+	FOREIGN KEY(주문제품) REFERENCES 제품(제품번호)
+);
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+INSERT INTO 고객 VALUES ('apple', '정소화', 20, 'gold', '학생', 1000);
+INSERT INTO 고객 VALUES ('banana', '김선우', 25, 'vip', '간호사', 2500);
+INSERT INTO 고객 VALUES ('carrot', '고명석', 28, 'gold', '교사', 4500);
+INSERT INTO 고객 VALUES ('orange', '김용욱', 22, 'silver', '학생', 0);
+INSERT INTO 고객 VALUES ('melon', '성원용', 35, 'gold', '회사원', 5000);
+INSERT INTO 고객 VALUES ('pear', '채광주', 31, 'silver', '회사원', 500);
+INSERT INTO 고객 VALUES ('peach', '오형준', NULL, 'silver', '의사', 300);
+
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+INSERT INTO 제품 VALUES ('p01', '그냥만두', 5000, 4500, '대한식품');
+INSERT INTO 제품 VALUES ('p02', '매운쫄면', 2500, 5500, '민국푸드');
+INSERT INTO 제품 VALUES ('p03', '쿵떡파이', 3600, 2600, '한빛제과');
+INSERT INTO 제품 VALUES ('p04', '맛난초콜렛', 1250, 2500, '한빛제과');
+INSERT INTO 제품 VALUES ('p05', '얼큰라면', 2200, 1200, '대한식품');
+INSERT INTO 제품 VALUES ('p06', '통통우동', 1000, 1550, '민국푸드');
+INSERT INTO 제품 VALUES ('p07', '달콤비스켓', 1650, 1500, '한빛제과');
+
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+INSERT INTO 주문 VALUES ('o01', 'apple', 'p03', 10, '서울시 마포구', '13/01/01');
+INSERT INTO 주문 VALUES ('o02', 'melon', 'p01', 5, '인천시 계양구', '13/01/10');
+INSERT INTO 주문 VALUES ('o03', 'banana', 'p06', 45, '경기도 부천시', '13/01/11');
+INSERT INTO 주문 VALUES ('o04', 'carrot', 'p02', 8, '부산시 금정구', '13/02/01');
+INSERT INTO 주문 VALUES ('o05', 'melon', 'p06', 36, '경기도 용인시', '13/02/20');
+INSERT INTO 주문 VALUES ('o06', 'banana', 'p01', 19, '충청북도 보은군', '13/03/02');
+INSERT INTO 주문 VALUES ('o07', 'apple', 'p03', 22, '서울시 영등포구', '13/03/15');
+INSERT INTO 주문 VALUES ('o08', 'pear', 'p02', 50, '강원도 춘천시', '13/04/10');
+INSERT INTO 주문 VALUES ('o09', 'banana', 'p04', 15, '전라남도 목포시', '13/04/11');
+INSERT INTO 주문 VALUES ('o10', 'carrot', 'p03', 20, '경기도 안양시', '13/05/22');
+
+--  고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+--  제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+--  주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+select * from 고객;
+select * from 제품;
+select * from 주문;
+
+/* --------------------------------------------- */
+-- (수정) 예제7-55 고객 테이블에서 등급이 vip인 
+-- 고객의 고객아이디, 고객이름, 나이, 등급으로 구성된
+-- 뷰를 우수고객이라는 이름으로 생성해보자
+-- 우수고객 뷰의 모든 내용을 검색해보자
+-- (WITH CHECK OPTION 사용)
+
+-- 고객(고객아이디, 고객이름, 나이, 등급, 직업, 적립금)
+-- 제품(제품번호, 제품명, 재고량, 단가, 제조업체)
+-- 주문(주문번호, 주문고객, 주문제품, 수량, 배송지, 주문일자)
+
+-- 우수고객(고객아이디, 고객이름, 나이, 등급)
+
+select * from 고객;
+
+--------------------------------------------------
+select * from 우수고객;
+
+-- 뷰에 입력/수정/삭제 시도
+insert into 우수고객(고객아이디, 고객이름, 나이, 등급)
+values('shinmi','신아로미',20,'gold');
+
+update 우수고객
+set   등급 = 'gold'
+where 고객아이디 = 'banana';
+
+delete 
+from   우수고객
+where 고객아이디 = 'banana';
+--------------------------------------------------
+/*-----------------------------------------------*/
+-- 3단계 스키마 구조
+drop table 가입고객;
+
+CREATE TABLE 가입고객 (
+    번호  int	NOT NULL,
+    이름  char(10),
+    성별  char(2) ,
+    나이  int ,
+    직업  char(10),
+    주소  char(20) ,
+    연락처 char(20) ,
+    PRIMARY KEY(번호)
+);
+
+INSERT INTO 가입고객 VALUES (1, '홍길동', '남', 20, '학생', '서울', NULL) ,
+                        (2, '임꺽정', '남', 22, '학생', '인천', '010-1111-1111') , 
+                        (3, '신아로미', '여', 20, '학생', '서울', '010-2222-2222') 
+;
+/*-----------------------------------------------*/
+# [요약] 데이터제어어(DCL): grant, revoke
+
+-데이터베이스의 권한 관리 
+
+1) 질의문에 대한 권한 관리 
+
+DDL과 DML은 DCL에 의해 허용 또는 거부
+
+DCL: GRANT, REVOKE, DENY
+
+2) 뷰에 대한 권한 관리
+
+[실습] 뷰 보안
+
+# (root)
+CREATE DATABASE kimdb
+   DEFAULT CHARACTER SET 'utf8mb4' ;
+
+# 사용자 생성: kim
+
+-------
+-- ===========================
+# (MySQL) 실습: 직원(이름,주소,전화번호,연봉)
+-- ===========================
+-- (MySQL) safe mode 해제
+SET SQL_SAFE_UPDATES = 0;
+
+-- 데이터베이스(testdb) / 테이블(직원)
+
+CREATE DATABASE testdb
+   DEFAULT CHARACTER SET utf8mb4 ;
+
+USE testdb;
+
+-- 직원(이름,주소,전화번호,연봉)
+CREATE TABLE 직원 (
+      이름           VARCHAR(20)       NOT NULL ,
+      주소           VARCHAR(100) ,
+      전화번호     CHAR(13)             NOT NULL ,
+      연봉           INT                     DEFAULT 0 ,
+      PRIMARY KEY(이름)
+);
+
+INSERT INTO 직원 VALUES('우태하','서울시 서초구','010-1111-1111',1000); 
+INSERT INTO 직원 VALUES('김선우','서울시 구로구','010-2222-2222',2000); 
+INSERT INTO 직원 VALUES('이영지','서울시 마포구','010-3333-3333',3000); 
+INSERT INTO 직원 VALUES('유희정','서울시 마포구','010-4444-4444',4000); 
+INSERT INTO 직원 VALUES('오형준','부산시 연산구','010-5555-5555',5000); 
+INSERT INTO 직원 VALUES('고진수','서울시 구로구','010-6666-6666',6000); 
+
+select * from 직원;
+
+-- 직원_뷰(이름,전화번호)
+
+CREATE VIEW 직원_뷰
+as 
+    SELECT 이름, 전화번호
+    FROM  직원;
+
+select * from 직원_뷰;
+-- ===========================
+-----
+# (root)
+
+-- (MySQL) safe mode 해제
+SET SQL_SAFE_UPDATES = 0;
+
+# 테이블 생성: 직원
+# 뷰 생성: 직원_뷰
+
+# (root) -> kim 에게 모든 권한 부여(직원_뷰)
+GRANT ALL PRIVILEGES on testdb.직원_뷰 TO 'kim'@'localhost' WITH GRANT OPTION;
+-----
+# (kim)
+테이블: testdb.직원_뷰(root) (모든 권한)
+
+-- (오류): 권한 없음
+select * from testdb.직원;
+
+-- (ok)
+select * from testdb.직원_뷰;
+
+-- 직원_뷰(이름,전화번호)
+insert into testdb.직원_뷰(이름,전화번호) values('오주원','010-9999-9999');
+
+-- (ok)
+delete 
+from testdb.직원_뷰 
+where 이름 = '오주원';
+
+-- 직원_뷰(이름,전화번호)
+insert into testdb.직원_뷰(이름,전화번호) values('황혜미','010-9999-9990');
+--------------------------------------------------

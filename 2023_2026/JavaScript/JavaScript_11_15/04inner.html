@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="header">Header 1</h1>
+    <script>
+        var header = document.getElementById('header');
+        header.onmouseover = function(){
+            header.innerHTML = '자바스크립트로 변경했어요.<br>';
+            header.innerHTML += '원래는 Header 1 이였답니다.';   
+        }
+
+        header.onmouseout= function(){
+            header.innerHTML = 'Header 1';
+        }
+    </script>
+</body>
+</html>

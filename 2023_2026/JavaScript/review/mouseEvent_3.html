@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Event and Toggle Style</title>
+    <style>
+        #toggleButton {
+            padding: 10px;
+            background-color: lightgreen;
+            cursor: pointer;
+        }
+        .highlight {
+            background-color: lightcoral;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButton = document.getElementById('toggleButton');
+
+            toggleButton.addEventListener('click', () => {
+                toggleButton.classList.toggle('highlight');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <button id="toggleButton">클릭하여 스타일 토글</button>
+</body>
+
+</html>

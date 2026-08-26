@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Resize Event</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('resize', () => {
+                const windowSizeDisplay = document.getElementById('windowSizeDisplay');
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                windowSizeDisplay.textContent = `윈도우 크기: 가로 ${windowWidth}px, 세로 ${windowHeight}px`;
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="windowSizeDisplay">창모드 윈도우 크기: </div>
+</body>
+
+</html>

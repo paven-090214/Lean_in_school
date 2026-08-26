@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div { border: 1px solid rgb(245, 16, 16);}
+    </style>
+</head>
+<body>
+    <div id="a" onclick="firstClick()"> 1. div</div>
+    <div id="b"> 2. div</div>
+    <div id="c"> 3. div</div>
+    <script>
+        function firstClick(){
+            var aText = document.getElementById("a");
+            aText.innerHtml="첫번째";
+        }
+
+        var bText = document.getElementById("b");
+        bText.onclick = function(){
+            bText.innerHtml="두번째";
+        }
+
+        var cText = document.getElementById("c");
+        cText.addEventListener('click', function(){
+            cText.innerHtml="세번째";
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            var text_num = 0;
+
+            function key_num(){
+                text_num = document.getElementById('text').value.length;
+                update_char();
+            }
+            
+            function update_char(){
+                document.querySelector('h1').textContent = `글자 수 : ${text_num}`;
+            }
+
+            document.addEventListener('keyup', key_num);
+        })
+
+    </script>
+</head>
+<body>
+    <h1>글자 수 : 0</h1>
+    <input type="textarea" id="text">
+</body>
+</html>

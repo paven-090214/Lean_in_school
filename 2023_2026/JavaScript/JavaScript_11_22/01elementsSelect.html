@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="a"></div>
+    <div id="b"></div>
+    <div id="c"></div>
+    <script>
+        var aVar = document.getElementById("a");
+        var bVar = document.querySelector("#b");
+        var cVar = document.getElementsByTagName("div");
+        aVar.innerText = "<h1> 첫번째</h1>";
+        bVar.innerHTML = "<h1> 두번째</h1>";
+        cVar[2].textContent = "<h1> 세번째</h1>";
+    </script>
+</body>
+</html>

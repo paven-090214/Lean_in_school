@@ -1,0 +1,37 @@
+import {useState} from "react";
+
+const basicwork = () => {
+  return['홍길동', '김철수'];
+}
+
+export default function App() {
+  const [names, setnames] = useState(()=>{
+    return basicwork;
+  });
+  const [userName, setUserName] = useState("");
+  
+  const handleChange = (e) => {
+    setUserName(e.target.value);
+  }
+
+  console.log(userName)
+
+  const add_list = () => {
+    setnames((preState) =>{
+      console.log(preState);
+      return [...names, userName];
+    })
+  }
+
+  return (
+    <div>
+      <input type="text" onChange={handleChange} value={userName}/>
+      <button onClick={add_list}>입력</button>
+      {names.map((name, index)=>(
+        <div key={index}>
+          {name}
+        </div>
+      ))}
+    </div>
+  );
+}

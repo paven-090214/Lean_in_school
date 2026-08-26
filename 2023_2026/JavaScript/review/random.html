@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            let count = 0;
+            const gameArea = document.getElementById('area');
+            const gameArea_2 = document.getElementById('area_2');
+            const gameArea_3 = document.getElementById('area_3');
+            startBtn.addEventListener('click', ()=>{
+                var random = Math.floor(Math.random() * 101);
+                gameArea.innerHTML += '<p>1부터 100까지의 숫자를 작성해주세요.</p>'
+                gameArea.innerHTML += '<input type="text" id="resultValue">'
+                gameArea.innerHTML += '<button id="resultBtn">확인</button>'
+                resultBtn.addEventListener('click', ()=>{
+                    count++;
+                    gameArea_2.innerHTML = `<p>시도 횟수: ${count}</p><div id="resultTxt"></div>`;
+                    const userGuess = parseInt(resultValue.value);
+                    if(random == userGuess){
+                        resultTxt.innerHTML = `정답은 ${random}이였습니다. ${count}번 만에 맞췄습니다.`
+                    }
+                    else if (random > userGuess){
+                        resultTxt.innerHTML = `${userGuess}값보다 큽니다.`
+                    }
+                    else if (random < userGuess){
+                        resultTxt.innerHTML = `${userGuess}값보다 작습니다.`
+                    }
+
+                    resultValue.value = '';
+                    
+                    if(count > 2){
+                        gameArea_3.innerHTML = '<button id="answerButton">정답</button>'
+                    }
+                    answerButton.addEventListener('click', ()=>{
+                        gameArea_3.innerHTML += `<p>정답 : ${random}</p>`;
+                        answerButton.disabled=true;
+                    })
+
+            })
+            })
+
+
+        })
+    </script>
+</head>
+<body>
+    <h1>숫자 맞추기</h1>
+    <button id="startBtn">게임 시작</button>
+    <div id="area"></div>
+    <div id="area_2"></div>
+    <div id="area_3"></div>
+</body>
+</html>
