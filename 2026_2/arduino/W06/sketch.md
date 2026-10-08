@@ -25,7 +25,7 @@ void loop()               // Main loop auto-repeats
   ndShade = -1*(tRight/(tLeft+tRight)-0.5); //Calculate it and subtract 0.5
   //어두운 쪽으로 움직임
   int speedLeft, speedRight;  // Declare speed variables
-
+  // if (ndShade > 0.0) 부호 변경, 31,37행 부호 변경 / ndshade 분자 tLeft 변환 / if문의 tRight, tLeft 모두 변경
   if (ndShade > 0.0)         // Shade on right?
   {                         // Slow down left wheel
     speedLeft = int(200.0 - (ndShade * 1000.0));
